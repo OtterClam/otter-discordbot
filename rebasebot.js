@@ -19,7 +19,7 @@ function updatePriceStatus() {
     await bot.user.setActivity(`Epoch: ${epoch} @ ${clock} UTC`);
     await Promise.all(
       bot.guilds.cache.map(async (guild) => {
-        await guild.me.setNickname(`Rebase In: ${nextRebaseIn}`);
+        await guild.me.setNickname(`Harvest In: ${nextRebaseIn}`);
       })
     );
   };
