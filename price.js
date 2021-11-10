@@ -1,73 +1,46 @@
-const { ethers } = require("ethers");
-const {
-  MimTimeReserveContract,
-  MimTimeBondContract,
-  StakingContract,
-} = require("./abi");
+const { ethers } = require('ethers')
+const { MimTimeReserveContract, MimTimeBondContract, StakingContract } = require('./abi')
 
-const {
-  RESERVE_MAI_CLAM,
-  BOND_MAI_CLAM,
-  BOND_MAI,
-  STAKING_ADDRESS,
-} = require("./constant");
+const { RESERVE_MAI_CLAM, BOND_MAI_CLAM, BOND_MAI, STAKING_ADDRESS } = require('./constant')
 
-const provider = new ethers.providers.JsonRpcProvider(
-  "https://rpc-mainnet.maticvigil.com/"
-);
+const provider = new ethers.providers.JsonRpcProvider('https://rpc-mainnet.maticvigil.com/')
 
-const bondContractMAI_CLAM = new ethers.Contract(
-  BOND_MAI_CLAM,
-  MimTimeBondContract,
-  provider
-);
+const bondContractMAI_CLAM = new ethers.Contract(BOND_MAI_CLAM, MimTimeBondContract, provider)
 
-const bondContractMAI = new ethers.Contract(
-  BOND_MAI,
-  MimTimeBondContract,
-  provider
-);
+const bondContractMAI = new ethers.Contract(BOND_MAI, MimTimeBondContract, provider)
 
-const pairContract = new ethers.Contract(
-  RESERVE_MAI_CLAM,
-  MimTimeReserveContract,
-  provider
-);
+const pairContract = new ethers.Contract(RESERVE_MAI_CLAM, MimTimeReserveContract, provider)
 
-const stakingContract = new ethers.Contract(
-  STAKING_ADDRESS,
-  StakingContract,
-  provider
-);
+const stakingContract = new ethers.Contract(STAKING_ADDRESS, StakingContract, provider)
 const getRawMarketPrice = async () => {
-  const reserves = await pairContract.getReserves();
-  return reserves[1].div(reserves[0]);
-};
+  const reserves = await pairContract.getReserves()
+  return reserves[1].div(reserves[0])
+}
 
-const getRawBondPrice = async (bondType) => {
-  if (bondType === "MAI") return bondContractMAI.bondPriceInUSD();
-  if (bondType === "MAI_CLAM") return bondContractMAI_CLAM.bondPriceInUSD();
-  throw Error(`Contract for bond doesn't support: ${bondType}`);
-};
+const getRawBondPrice = async bondType => {
+  if (bondType === 'MAI') return bondContractMAI.bondPriceInUSD()
+  if (bondType === 'MAI_CLAM') return bondContractMAI_CLAM.bondPriceInUSD()
+  throw Error(`Contract for bond doesn't support: ${bondType}`)
+}
 
 const getRawStakingBalance = async () => {
-  return stakingContract.contractBalance();
-};
+  return stakingContract.contractBalance()
+}
 
 const getEpoch = async () => {
-  const { number, endTime } = await stakingContract.epoch();
-  const currentBlock = await provider.getBlockNumber();
-  const currentBlockTime = (await provider.getBlock(currentBlock)).timestamp;
+  const { number, endTime } = await stakingContract.epoch()
+  const currentBlock = await provider.getBlockNumber()
+  const currentBlockTime = (await provider.getBlock(currentBlock)).timestamp
   return {
     epoch: number.toNumber(),
     currentBlockTime,
     currentEndTime: endTime.toNumber(),
-  };
-};
+  }
+}
 
 module.exports = {
   getRawMarketPrice,
   getRawBondPrice,
   getRawStakingBalance,
   getEpoch,
-};
+}
