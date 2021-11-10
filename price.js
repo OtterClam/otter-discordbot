@@ -54,8 +54,20 @@ const getRawStakingBalance = async () => {
   return stakingContract.contractBalance();
 };
 
+const getEpoch = async () => {
+  const { number, endTime } = await stakingContract.epoch();
+  const currentBlock = await provider.getBlockNumber();
+  const currentBlockTime = (await provider.getBlock(currentBlock)).timestamp;
+  return {
+    epoch: number.toNumber(),
+    currentBlockTime,
+    currentEndTime: endTime.toNumber(),
+  };
+};
+
 module.exports = {
   getRawMarketPrice,
   getRawBondPrice,
   getRawStakingBalance,
+  getEpoch,
 };

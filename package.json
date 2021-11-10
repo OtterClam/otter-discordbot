@@ -4,10 +4,11 @@
   "description": "Discord bot for pulling cryptocurrency price data at intervals and displaying it in the users sidebar.",
   "main": "index.js",
   "scripts": {
-    "start": "concurrently \"yarn:pricebot\" \"yarn:bondbot:mai\" \"yarn:bondbot:mai_clam\"",
+    "start": "concurrently \"yarn:pricebot\" \"yarn:bondbot:mai\" \"yarn:bondbot:mai_clam\" \"yarn:rebasebot\"",
     "pricebot": "node pricebot.js",
     "bondbot:mai": "node bondbot.js MAI",
     "bondbot:mai_clam": "node bondbot.js MAI_CLAM",
+    "rebasebot": "node rebasebot.js",
     "debug": "node --inspect-brk index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "test-eslint": "eslint src/**/*.js src/**/*.jsx"
