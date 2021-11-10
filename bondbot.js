@@ -31,7 +31,7 @@ function updateBondStatus() {
 
     console.log(`${pastPrice} ${price}, ROI ${roi}`);
 
-    const bondName = process.argv[2] == "MAI" ? "MAI Bond" : "CLAM/MAI Bond";
+    const bondName = process.argv[2] == "MAI" ? "Bond-MAI" : "Bond-CLAM/MAI";
     await bot.user.setActivity({
       name: `$${price} ROI: ${roi}%`,
       type: "WATCHING",
