@@ -1,4 +1,4 @@
-const commaPrice = x => {
+const commaPrice = (x) => {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
 
@@ -6,7 +6,7 @@ const priceArrow = (price, pastPrice, pastArrow) => {
   return price === pastPrice ? pastArrow : price > pastPrice ? '(↗)' : '(↘)'
 }
 
-const prettifySeconds = seconds => {
+const prettifySeconds = (seconds) => {
   if (seconds !== 0 && !seconds) {
     return ''
   }

@@ -18,7 +18,7 @@ function updatePriceStatus() {
 
     await bot.user.setActivity(`Epoch: ${epoch} @ ${clock} UTC`)
     await Promise.all(
-      bot.guilds.cache.map(async guild => {
+      bot.guilds.cache.map(async (guild) => {
         await guild.me.setNickname(`Harvest In: ${nextRebaseIn}`)
       }),
     )
@@ -27,7 +27,7 @@ function updatePriceStatus() {
 }
 
 // New server join event that causes the guild cache to refresh
-bot.on('guildCreate', guild => {
+bot.on('guildCreate', (guild) => {
   console.log(`New server has added the bot! Name: ${guild.name}`)
 })
 

@@ -1,15 +1,26 @@
 const { ethers } = require('ethers')
-const { MimTimeReserveContract, MimTimeBondContract, StakingContract } = require('./abi')
-
-const { RESERVE_MAI_CLAM, BOND_MAI_CLAM, BOND_MAI, STAKING_ADDRESS } = require('./constant')
+const {
+  MimTimeReserveContract,
+  MimTimeBondContract,
+  StakingContract,
+  ClamTokenContract,
+  ClamCirculatingSupply,
+} = require('./abi')
+const {
+  RESERVE_MAI_CLAM,
+  BOND_MAI_CLAM,
+  BOND_MAI,
+  STAKING_ADDRESS,
+  CLAM_ADDRESS,
+  CLAM_CIRCULATING_SUPPLY,
+} = require('./constant')
 
 const provider = new ethers.providers.JsonRpcProvider('https://rpc-mainnet.maticvigil.com/')
-
 const bondContractMAI_CLAM = new ethers.Contract(BOND_MAI_CLAM, MimTimeBondContract, provider)
-
 const bondContractMAI = new ethers.Contract(BOND_MAI, MimTimeBondContract, provider)
-
 const pairContract = new ethers.Contract(RESERVE_MAI_CLAM, MimTimeReserveContract, provider)
+const clamContract = new ethers.Contract(CLAM_ADDRESS, ClamTokenContract, provider)
+const clamCirculatingSupply = new ethers.Contract(CLAM_CIRCULATING_SUPPLY, ClamCirculatingSupply, provider)
 
 const stakingContract = new ethers.Contract(STAKING_ADDRESS, StakingContract, provider)
 const getRawMarketPrice = async () => {
@@ -17,7 +28,7 @@ const getRawMarketPrice = async () => {
   return reserves[1].div(reserves[0])
 }
 
-const getRawBondPrice = async bondType => {
+const getRawBondPrice = async (bondType) => {
   if (bondType === 'MAI') return bondContractMAI.bondPriceInUSD()
   if (bondType === 'MAI_CLAM') return bondContractMAI_CLAM.bondPriceInUSD()
   throw Error(`Contract for bond doesn't support: ${bondType}`)
@@ -38,9 +49,34 @@ const getEpoch = async () => {
   }
 }
 
+const getTotalSupply = async () => {
+  return Number((await clamContract.totalSupply()) / 1e9).toFixed(0)
+}
+
+const getStakingTVL = async (rawPrice) => {
+  const rawMarketPrice = rawPrice || (await getRawMarketPrice())
+  const stakingBalance = await getRawStakingBalance()
+  return Number((stakingBalance * rawMarketPrice) / 1e18).toFixed(0)
+}
+
+const getMarketCap = async (rawPrice) => {
+  const marketPrice = rawPrice || (await getRawMarketPrice())
+  const circSupply = await clamCirculatingSupply.CLAMCirculatingSupply()
+  return Number((circSupply * marketPrice) / 1e18).toFixed(0)
+}
+
+const getMarketPrice = async (rawPrice) => {
+  const rawMarketPrice = rawPrice || (await getRawMarketPrice())
+  return Number((rawMarketPrice.toNumber() / 1e9).toFixed(4))
+}
+
 module.exports = {
   getRawMarketPrice,
   getRawBondPrice,
   getRawStakingBalance,
   getEpoch,
+  getTotalSupply,
+  getMarketCap,
+  getMarketPrice,
+  getStakingTVL,
 }

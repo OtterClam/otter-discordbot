@@ -1,41 +1,41 @@
 require('dotenv').config()
 const { DISCORD_PRICE_BOT_TOKEN, UPDATE_INTERVAL } = process.env
 const { commaPrice, priceArrow } = require('./utils')
-const { getRawMarketPrice, getRawStakingBalance } = require('./price')
+const { getMarketPrice, getStakingTVL, getRawMarketPrice, getMarketCap, getTotalSupply } = require('./price')
 
 const { Client } = require('discord.js')
 
 const bot = new Client()
-async function getPriceData() {
-  const rawMarketPrice = await getRawMarketPrice()
-  const marketPrice = Number((rawMarketPrice.toNumber() / Math.pow(10, 9)).toFixed(4))
-
-  const stakingBalance = await getRawStakingBalance()
-  const stakingTVL = ((stakingBalance * marketPrice) / Math.pow(10, 9)).toFixed(0)
-
-  return {
-    price: marketPrice,
-    tvl: commaPrice(stakingTVL),
-  }
-}
-
 let pastPriceBuf = 0
 let pastArrow = ''
+let count = 0
 function updatePriceStatus() {
   const updatePriceAsync = async () => {
     const pastPrice = pastPriceBuf
-    const { tvl, price } = await getPriceData()
+    const rawPrice = await getRawMarketPrice()
+    const price = await getMarketPrice(rawPrice)
     pastPriceBuf = price
+
     const arrow = priceArrow(price, pastPrice, pastArrow)
     pastArrow = arrow
 
-    console.log(`${pastPrice} ${arrow} ${price}, TVL ${tvl}`)
+    let activity
+    if (count % 3 == 0) {
+      const tvl = commaPrice(await getStakingTVL(rawPrice))
+      activity = `TVL: $${tvl}`
+    } else if (count % 3 == 1) {
+      const marketCap = commaPrice(await getMarketCap(rawPrice))
+      activity = `MarketCap: $${marketCap}`
+    } else {
+      const TotalSupply = commaPrice(await getTotalSupply())
+      activity = `TotalSupply: ${TotalSupply}`
+    }
+    count++
+    console.log(`${pastPrice} ${arrow} ${price}, ${activity}`)
 
-    await bot.user.setActivity(`TVL: $${tvl}`, {
-      type: 'WATCHING',
-    })
+    await bot.user.setActivity(activity)
     await Promise.all(
-      bot.guilds.cache.map(async guild => {
+      bot.guilds.cache.map(async (guild) => {
         await guild.me.setNickname(`$${price} ${arrow}`)
       }),
     )
@@ -44,7 +44,7 @@ function updatePriceStatus() {
 }
 
 // New server join event that causes the guild cache to refresh
-bot.on('guildCreate', guild => {
+bot.on('guildCreate', (guild) => {
   console.log(`New server has added the bot! Name: ${guild.name}`)
 })
 

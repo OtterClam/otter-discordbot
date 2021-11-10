@@ -27,12 +27,9 @@ function updateBondStatus() {
     console.log(`${pastPrice} ${price}, ROI ${roi}`)
 
     const bondName = process.argv[2] == 'MAI' ? 'Bond MAI' : 'Bond CLAM/MAI'
-    await bot.user.setActivity({
-      name: `$${price} ROI: ${roi}%`,
-      type: 'WATCHING',
-    })
+    await bot.user.setActivity(`$${price} ROI: ${roi}%`)
     await Promise.all(
-      bot.guilds.cache.map(async guild => {
+      bot.guilds.cache.map(async (guild) => {
         await guild.me.setNickname(`${bondName}`)
       }),
     )
@@ -41,7 +38,7 @@ function updateBondStatus() {
 }
 
 // New server join event that causes the guild cache to refresh
-bot.on('guildCreate', guild => {
+bot.on('guildCreate', (guild) => {
   console.log(`New server has added the bot! Name: ${guild.name}`)
 })
 
