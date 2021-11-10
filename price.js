@@ -34,6 +34,13 @@ const getRawBondPrice = async (bondType) => {
   throw Error(`Contract for bond doesn't support: ${bondType}`)
 }
 
+const getBondROI = async (bondType, rawPrice) => {
+  const rawMarketPrice = await getRawMarketPrice()
+  const rawBondPrice = rawPrice || (await getRawBondPrice(bondType))
+  const bondDiscount = (rawMarketPrice * 1e9 - rawBondPrice) / rawBondPrice
+  return Number(100 * bondDiscount).toFixed(2)
+}
+
 const getRawStakingBalance = async () => {
   return stakingContract.contractBalance()
 }
@@ -79,4 +86,5 @@ module.exports = {
   getMarketCap,
   getMarketPrice,
   getStakingTVL,
+  getBondROI,
 }

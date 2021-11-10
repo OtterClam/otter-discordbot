@@ -1,33 +1,21 @@
 require('dotenv').config()
 const { DISCORD_BOND_MAI_CLAM_BOT_TOKEN, DISCORD_BOND_MAI_BOT_TOKEN, UPDATE_INTERVAL } = process.env
-const { getRawMarketPrice, getRawBondPrice } = require('./price')
+const { getRawMarketPrice, getRawBondPrice, getBondROI } = require('./price')
 
 const { Client } = require('discord.js')
 
 const bot = new Client()
-let pastPriceBuf
-
-const getPriceData = async () => {
-  const rawMarketPrice = await getRawMarketPrice()
-  const rawBondPrice = await getRawBondPrice(process.argv[2])
-  const bondDiscount = (rawMarketPrice.toNumber() * Math.pow(10, 9) - rawBondPrice) / rawBondPrice
-
-  return {
-    price: Number(rawBondPrice / Math.pow(10, 18)).toFixed(2),
-    roi: Number(bondDiscount * 100).toFixed(2),
-  }
-}
 
 function updateBondStatus() {
   const updatePriceAsync = async () => {
-    const { roi, price } = await getPriceData()
-    const pastPrice = pastPriceBuf || 0
-    pastPriceBuf = price
+    const rawBondPrice = await getRawBondPrice(process.argv[2])
+    const price = Number(rawBondPrice / 1e18).toFixed(2)
+    const roi = await getBondROI(process.argv[2], rawBondPrice)
 
-    console.log(`${pastPrice} ${price}, ROI ${roi}`)
-
+    const activity = `$${price} ROI: ${roi}%`
+    console.log(activity)
     const bondName = process.argv[2] == 'MAI' ? 'Bond MAI' : 'Bond CLAM/MAI'
-    await bot.user.setActivity(`$${price} ROI: ${roi}%`)
+    await bot.user.setActivity(activity)
     await Promise.all(
       bot.guilds.cache.map(async (guild) => {
         await guild.me.setNickname(`${bondName}`)
