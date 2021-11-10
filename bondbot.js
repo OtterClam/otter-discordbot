@@ -1,6 +1,6 @@
 require('dotenv').config()
 const { DISCORD_BOND_MAI_CLAM_BOT_TOKEN, DISCORD_BOND_MAI_BOT_TOKEN, UPDATE_INTERVAL } = process.env
-const { getRawMarketPrice, getRawBondPrice, getBondROI } = require('./price')
+const { getRawBondPrice, getBondROI } = require('./price')
 
 const { Client } = require('discord.js')
 
