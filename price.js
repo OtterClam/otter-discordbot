@@ -60,9 +60,9 @@ const getStakingTVL = async (rawPrice) => {
 }
 
 const getMarketCap = async (rawPrice) => {
-  const marketPrice = rawPrice || (await getRawMarketPrice())
+  const rawMarketPrice = rawPrice || (await getRawMarketPrice())
   const circSupply = await clamCirculatingSupply.CLAMCirculatingSupply()
-  return Number((circSupply * marketPrice) / 1e18).toFixed(0)
+  return Number((circSupply * rawMarketPrice) / 1e18).toFixed(0)
 }
 
 const getMarketPrice = async (rawPrice) => {
