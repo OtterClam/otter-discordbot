@@ -6,8 +6,6 @@ const { getRawMarketPrice, getRawStakingBalance } = require('./price')
 const { Client } = require('discord.js')
 
 const bot = new Client()
-let pastPriceBuf
-
 async function getPriceData() {
   const rawMarketPrice = await getRawMarketPrice()
   const marketPrice = Number((rawMarketPrice.toNumber() / Math.pow(10, 9)).toFixed(4))
@@ -21,12 +19,16 @@ async function getPriceData() {
   }
 }
 
+let pastPriceBuf = 0
+let pastArrow = ''
 function updatePriceStatus() {
   const updatePriceAsync = async () => {
+    const pastPrice = pastPriceBuf
     const { tvl, price } = await getPriceData()
-    const pastPrice = pastPriceBuf || 0
     pastPriceBuf = price
-    const arrow = priceArrow(price, pastPrice)
+    const arrow = priceArrow(price, pastPrice, pastArrow)
+    pastArrow = arrow
+
     console.log(`${pastPrice} ${arrow} ${price}, TVL ${tvl}`)
 
     await bot.user.setActivity(`TVL: $${tvl}`, {
