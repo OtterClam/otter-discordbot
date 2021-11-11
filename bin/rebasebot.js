@@ -4,12 +4,10 @@ const { getEpoch } = require('../src/fetcher')
 const { prettifySeconds } = require('../src/utils')
 const { sidebarFactory } = require('../src/sidebar')
 
-const rebasebot = sidebarFactory(
-  {
-    token: DISCORD_REBASE_BOT_TOKEN,
-    interval: UPDATE_INTERVAL,
-  },
-  async () => {
+const rebasebot = sidebarFactory({
+  token: DISCORD_REBASE_BOT_TOKEN,
+  interval: UPDATE_INTERVAL,
+  setSidebar: async () => {
     const { epoch, currentBlockTime, currentEndTime } = await getEpoch()
 
     const nextRebaseIn = prettifySeconds(currentEndTime - currentBlockTime)
@@ -22,6 +20,6 @@ const rebasebot = sidebarFactory(
       activity: `Epoch: ${epoch} @ ${clock} UTC`,
     }
   },
-)
+})
 
 rebasebot()

@@ -3,7 +3,7 @@ const { DISCORD_BOND_MAI_CLAM_BOT_TOKEN, DISCORD_BOND_MAI_BOT_TOKEN, UPDATE_INTE
 const { getRawBondPrice, getBondROI } = require('../src/fetcher')
 const { sidebarFactory } = require('../src/sidebar')
 
-const fetcherFunc = async () => {
+const setSidebar = async () => {
   const bondType = process.argv[2]
   const title = bondType === 'MAI' ? 'Bond MAI' : 'Bond CLAM/MAI'
   const rawBondPrice = await getRawBondPrice(bondType)
@@ -19,21 +19,17 @@ const fetcherFunc = async () => {
 
 let bondbot
 if (process.argv[2] === 'MAI') {
-  bondbot = sidebarFactory(
-    {
-      token: DISCORD_BOND_MAI_BOT_TOKEN,
-      interval: UPDATE_INTERVAL,
-    },
-    fetcherFunc,
-  )
+  bondbot = sidebarFactory({
+    token: DISCORD_BOND_MAI_BOT_TOKEN,
+    interval: UPDATE_INTERVAL,
+    setSidebar,
+  })
 } else if (process.argv[2] === 'MAI_CLAM') {
-  bondbot = sidebarFactory(
-    {
-      token: DISCORD_BOND_MAI_CLAM_BOT_TOKEN,
-      interval: UPDATE_INTERVAL,
-    },
-    fetcherFunc,
-  )
+  bondbot = sidebarFactory({
+    token: DISCORD_BOND_MAI_CLAM_BOT_TOKEN,
+    interval: UPDATE_INTERVAL,
+    setSidebar,
+  })
 } else {
   throw new Error('should input MAI or MAI_CLAM')
 }

@@ -8,12 +8,10 @@ let pastPriceBuf = 0
 let pastArrow = ''
 let count = 0
 
-const pricebot = sidebarFactory(
-  {
-    token: DISCORD_PRICE_BOT_TOKEN,
-    interval: UPDATE_INTERVAL,
-  },
-  async () => {
+const pricebot = sidebarFactory({
+  token: DISCORD_PRICE_BOT_TOKEN,
+  interval: UPDATE_INTERVAL,
+  setSidebar: async () => {
     const pastPrice = pastPriceBuf
     const rawPrice = await getRawMarketPrice()
     const price = await getMarketPrice(rawPrice)
@@ -41,6 +39,6 @@ const pricebot = sidebarFactory(
       activity,
     }
   },
-)
+})
 
 pricebot()
