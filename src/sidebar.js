@@ -1,0 +1,30 @@
+const { Client } = require('discord.js')
+
+const sidebarFactory = (opts, sidebarStatusFetcher) => {
+  const { token, interval } = opts
+  const bot = new Client()
+  bot.on('guildCreate', (guild) => {
+    console.log(`New server has added the bot! Name: ${guild.name}`)
+  })
+  const loop = () => {
+    const loopAsync = async () => {
+      const { title, activity } = await sidebarStatusFetcher()
+      await Promise.all([bot.user.setActivity(activity), bot.guilds.cache.map((guild) => guild.me.setNickname(title))])
+    }
+    loopAsync().catch(console.error)
+  }
+
+  bot.on('ready', () => {
+    console.log(`Logged in as ${bot.user.tag}!`)
+    loop()
+    setInterval(loop, interval)
+  })
+
+  return () => {
+    bot.login(token)
+  }
+}
+
+module.exports = {
+  sidebarFactory,
+}
