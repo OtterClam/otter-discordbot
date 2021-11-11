@@ -1,7 +1,7 @@
 require('dotenv').config()
 const { DISCORD_PRICE_BOT_TOKEN, UPDATE_INTERVAL } = process.env
-const { commaPrice, priceArrow } = require('./utils')
-const { getMarketPrice, getStakingTVL, getRawMarketPrice, getMarketCap, getTotalSupply } = require('./price')
+const { commaPrice, priceArrow } = require('../src/utils')
+const { getMarketPrice, getStakingTVL, getRawMarketPrice, getMarketCap, getTotalSupply } = require('../src/fetcher')
 
 const { Client } = require('discord.js')
 
@@ -33,12 +33,10 @@ function updatePriceStatus() {
     count++
     console.log(`${pastPrice} ${arrow} ${price}, ${activity}`)
 
-    await bot.user.setActivity(activity)
-    await Promise.all(
-      bot.guilds.cache.map(async (guild) => {
-        await guild.me.setNickname(`$${price} ${arrow}`)
-      }),
-    )
+    await Promise.all([
+      bot.user.setActivity(activity),
+      bot.guilds.cache.map((guild) => guild.me.setNickname(`$${price} ${arrow}`)),
+    ])
   }
   updatePriceAsync().catch(console.error)
 }

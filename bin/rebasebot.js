@@ -1,7 +1,7 @@
 require('dotenv').config()
 const { DISCORD_REBASE_BOT_TOKEN, UPDATE_INTERVAL } = process.env
-const { getEpoch } = require('./price')
-const { prettifySeconds } = require('./utils')
+const { getEpoch } = require('../src/fetcher')
+const { prettifySeconds } = require('../src/utils')
 
 const { Client } = require('discord.js')
 
@@ -16,12 +16,10 @@ function updatePriceStatus() {
     const clock = t.getUTCHours() + ':' + t.getUTCMinutes()
     console.log(`${epoch} ${nextRebaseIn} @ ${clock} UTC`)
 
-    await bot.user.setActivity(`Epoch: ${epoch} @ ${clock} UTC`)
-    await Promise.all(
-      bot.guilds.cache.map(async (guild) => {
-        await guild.me.setNickname(`Harvest In: ${nextRebaseIn}`)
-      }),
-    )
+    await Promise.all([
+      bot.user.setActivity(`Epoch: ${epoch} @ ${clock} UTC`),
+      bot.guilds.cache.map((guild) => guild.me.setNickname(`Harvest In: ${nextRebaseIn}`)),
+    ])
   }
   updatePriceAsync().catch(console.error)
 }
