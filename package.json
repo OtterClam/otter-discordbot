@@ -3,16 +3,11 @@
   "version": "1.0.0",
   "description": "Discord bot for pulling cryptocurrency data at intervals and displaying it in the users sidebar.",
   "scripts": {
-    "start": "concurrently \"yarn:pricebot\" \"yarn:bondbot:mai\" \"yarn:bondbot:mai_clam\" \"yarn:rebasebot\"",
-    "pricebot": "node bin/pricebot.js",
-    "bondbot:mai": "node bin/bondbot.js MAI",
-    "bondbot:mai_clam": "node bin/bondbot.js MAI_CLAM",
-    "rebasebot": "node bin/rebasebot.js"
+    "start": "node index.js"
   },
   "author": "d0c0q@otterclam.finance",
   "license": "MIT",
   "dependencies": {
-    "concurrently": "^6.3.0",
     "discord.js": "^12.2.0",
     "dotenv": "^10.0.0",
     "ethers": "^5.5.1"

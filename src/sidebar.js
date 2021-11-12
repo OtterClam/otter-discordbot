@@ -21,9 +21,7 @@ const sidebarFactory = (opts) => {
     setInterval(loop, interval)
   })
 
-  return () => {
-    bot.login(token)
-  }
+  return () => bot.login(token)
 }
 
 module.exports = {
