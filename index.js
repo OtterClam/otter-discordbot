@@ -57,14 +57,23 @@ const pricebot = sidebarFactory({
 
 const makeRebaseSidebar = (bondType) => async () => {
   const title = bondType === 'MAI' ? 'Bond MAI' : 'Bond CLAM/MAI'
-  const rawBondPrice = await getRawBondPrice(bondType)
-  const price = Number(rawBondPrice / 1e18).toFixed(2)
-  const roi = await getBondROI(process.argv[2], rawBondPrice)
-  const activity = `$${price} ROI: ${roi}%`
-  console.log(`bondbot  : ${activity} ${bondType}`)
-  return {
-    title,
-    activity,
+  try {
+    const rawBondPrice = await getRawBondPrice(bondType)
+    const price = Number(rawBondPrice / 1e18).toFixed(2)
+    const roi = await getBondROI(process.argv[2], rawBondPrice)
+    const activity = `$${price} ROI: ${roi}%`
+    console.log(`bondbot  : ${activity} ${bondType}`)
+    return {
+      title,
+      activity,
+    }
+  } catch (e) {
+    const activity = `$0 ROI: $0%`
+    console.log(`bondbot  : ${activity} ${bondType}`)
+    return {
+      title,
+      activity,
+    }
   }
 }
 

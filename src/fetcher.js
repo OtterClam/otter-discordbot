@@ -1,7 +1,7 @@
-const { ethers } = require('ethers')
+const { ethers, BigNumber } = require('ethers')
 const {
   MimTimeReserveContract,
-  MimTimeBondContract,
+  OtterBondDepository,
   StakingContract,
   ClamTokenContract,
   ClamCirculatingSupply,
@@ -16,8 +16,8 @@ const {
 } = require('./constant')
 
 const provider = new ethers.providers.JsonRpcProvider('https://rpc-mainnet.maticvigil.com/')
-const bondContractMAI_CLAM = new ethers.Contract(BOND_MAI_CLAM, MimTimeBondContract, provider)
-const bondContractMAI = new ethers.Contract(BOND_MAI, MimTimeBondContract, provider)
+const bondContractMAI_CLAM = new ethers.Contract(BOND_MAI_CLAM, OtterBondDepository, provider)
+const bondContractMAI = new ethers.Contract(BOND_MAI, OtterBondDepository, provider)
 const pairContract = new ethers.Contract(RESERVE_MAI_CLAM, MimTimeReserveContract, provider)
 const clamContract = new ethers.Contract(CLAM_ADDRESS, ClamTokenContract, provider)
 const clamCirculatingSupply = new ethers.Contract(CLAM_CIRCULATING_SUPPLY, ClamCirculatingSupply, provider)
@@ -25,7 +25,11 @@ const clamCirculatingSupply = new ethers.Contract(CLAM_CIRCULATING_SUPPLY, ClamC
 const stakingContract = new ethers.Contract(STAKING_ADDRESS, StakingContract, provider)
 const getRawMarketPrice = async () => {
   const reserves = await pairContract.getReserves()
-  return reserves[1].div(reserves[0])
+  const [clam, mai] = BigNumber.from(RESERVE_MAI_CLAM).gt(CLAM_ADDRESS)
+    ? [reserves[0], reserves[1]]
+    : [reserves[1], reserves[0]]
+  const marketPrice = mai.div(clam)
+  return marketPrice
 }
 
 const getRawBondPrice = async (bondType) => {
