@@ -1,1 +1,2 @@
-worker: yarn start
+worker: yarn worker
+web: yarn web

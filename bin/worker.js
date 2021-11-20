@@ -15,9 +15,9 @@ const {
   getRawBondPrice,
   getBondROI,
   getEpoch,
-} = require('./src/fetcher')
-const { sidebarFactory } = require('./src/sidebar')
-const { commaPrice, priceArrow, prettifySeconds } = require('./src/utils')
+} = require('../src/fetcher')
+const { sidebarFactory } = require('../src/sidebar')
+const { commaPrice, priceArrow, prettifySeconds } = require('../src/utils')
 
 let pastPriceBuf = 0
 let pastArrow = ''
