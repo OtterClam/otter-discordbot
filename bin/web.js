@@ -21,6 +21,7 @@ app.get(
 
     const f = allowedValues[key]
     const ret = await f()
+    res.set('content-type', 'text/plain')
     return res.send(`${ret}`)
   }),
 )
