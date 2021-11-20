@@ -19,7 +19,7 @@ const prettifySeconds = (seconds) => {
   const hDisplay = h > 0 ? h + 'h' : ''
   const mDisplay = m > 0 ? m + 'm' : ''
 
-  return dDisplay + hDisplay + mDisplay
+  return seconds < 60 ? '0m' : dDisplay + hDisplay + mDisplay
 }
 
 module.exports = {

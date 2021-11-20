@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "Discord bot for pulling cryptocurrency data at intervals and displaying it in the users sidebar.",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "jest"
   },
   "author": "d0c0q@otterclam.finance",
   "license": "MIT",
@@ -13,6 +14,8 @@
     "ethers": "^5.5.1"
   },
   "devDependencies": {
-    "eslint": "^8.1.0"
+    "@types/jest": "^27.0.3",
+    "eslint": "^8.1.0",
+    "jest": "^27.3.1"
   }
 }

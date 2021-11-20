@@ -1,5 +1,6 @@
 module.exports = {
   env: {
+    'jest/globals': true,
     es2021: true,
     node: true,
   },
