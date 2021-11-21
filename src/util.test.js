@@ -15,12 +15,12 @@ describe('commaPrice', () => {
 
 describe('priceArrow', () => {
   it.each([
-    { price: 0, pastPrice: 100, pastArrow: '(↗)', expected: '(↘)' },
-    { price: 0, pastPrice: 100, pastArrow: '(↘)', expected: '(↘)' },
-    { price: 100, pastPrice: 0, pastArrow: '(↗)', expected: '(↗)' },
-    { price: 100, pastPrice: 0, pastArrow: '(↘)', expected: '(↗)' },
-    { price: 100, pastPrice: 100, pastArrow: '(↗)', expected: '(↗)' },
-    { price: 100, pastPrice: 100, pastArrow: '(↘)', expected: '(↘)' },
+    { price: 0, pastPrice: 100, pastArrow: '↗', expected: '↘' },
+    { price: 0, pastPrice: 100, pastArrow: '↘', expected: '↘' },
+    { price: 100, pastPrice: 0, pastArrow: '↗', expected: '↗' },
+    { price: 100, pastPrice: 0, pastArrow: '↘', expected: '↗' },
+    { price: 100, pastPrice: 100, pastArrow: '↗', expected: '↗' },
+    { price: 100, pastPrice: 100, pastArrow: '↘', expected: '↘' },
   ])('$pastPrice $pastArrow -> $expected $price', ({ price, pastPrice, pastArrow, expected }) => {
     expect(priceArrow(price, pastPrice, pastArrow)).toBe(expected)
   })
