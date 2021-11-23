@@ -1,4 +1,4 @@
-const { prettifySeconds, priceArrow, commaPrice } = require('./utils.js')
+const { utcClock, prettifySeconds, priceArrow, commaPrice } = require('./utils.js')
 
 describe('commaPrice', () => {
   it.each([
@@ -21,7 +21,7 @@ describe('priceArrow', () => {
     { price: 100, pastPrice: 0, pastArrow: '↘', expected: '↗' },
     { price: 100, pastPrice: 100, pastArrow: '↗', expected: '↗' },
     { price: 100, pastPrice: 100, pastArrow: '↘', expected: '↘' },
-  ])('$pastPrice $pastArrow -> $expected $price', ({ price, pastPrice, pastArrow, expected }) => {
+  ])('$pastArrow $pastPrice $expected $price', ({ price, pastPrice, pastArrow, expected }) => {
     expect(priceArrow(price, pastPrice, pastArrow)).toBe(expected)
   })
 })
@@ -41,5 +41,15 @@ describe('prettifySeconds', () => {
     { s: 60 + 60 * 60 + 24 * 60 * 60, expected: '1d1h1m' },
   ])('$s -> $expected', ({ s, expected }) => {
     expect(prettifySeconds(s)).toBe(expected)
+  })
+})
+
+describe('utcClock', () => {
+  it.each([
+    { t: new Date('2021-01-01T11:22:33Z'), expected: '11:22' },
+    { t: new Date('2021-01-01T11:02:33Z'), expected: '11:02' },
+    { t: new Date('2021-01-01T01:02:33Z'), expected: '1:02' },
+  ])('$t -> $expected', ({ t, expected }) => {
+    expect(utcClock(t)).toBe(expected)
   })
 })

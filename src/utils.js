@@ -22,8 +22,15 @@ const prettifySeconds = (seconds) => {
   return seconds < 60 ? '0m' : dDisplay + hDisplay + mDisplay
 }
 
+const utcClock = (t) => {
+  const h = t.getUTCHours()
+  const m = t.getUTCMinutes().toString().padStart(2, '0')
+  return `${h}:${m}`
+}
+
 module.exports = {
   commaPrice,
   priceArrow,
   prettifySeconds,
+  utcClock,
 }

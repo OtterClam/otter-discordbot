@@ -17,7 +17,7 @@ const {
   getEpoch,
 } = require('../src/fetcher')
 const { sidebarFactory } = require('../src/sidebar')
-const { commaPrice, priceArrow, prettifySeconds } = require('../src/utils')
+const { commaPrice, priceArrow, prettifySeconds, utcClock } = require('../src/utils')
 
 let pastPriceBuf = 0
 let pastArrow = ''
@@ -95,8 +95,7 @@ const rebasebot = sidebarFactory({
     const { epoch, currentBlockTime, currentEndTime } = await getEpoch()
 
     const nextRebaseIn = prettifySeconds(currentEndTime - currentBlockTime)
-    const t = new Date(currentBlockTime * 1000)
-    const clock = t.getUTCHours() + ':' + t.getUTCMinutes()
+    const clock = utcClock(new Date(currentBlockTime * 1000))
     console.log(`rebasebot: ${epoch} ${nextRebaseIn} @ ${clock} UTC`)
 
     return {
