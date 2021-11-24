@@ -4,6 +4,7 @@ const {
   DISCORD_PRICE_BOT_TOKEN,
   DISCORD_BOND_MAI_CLAM_BOT_TOKEN,
   DISCORD_BOND_MAI_BOT_TOKEN,
+  DISCORD_BOND_FRAX_BOT_TOKEN,
   UPDATE_INTERVAL,
 } = process.env
 const {
@@ -61,7 +62,20 @@ const pricebot = sidebarFactory({
 })
 
 const makeRebaseSidebar = (bondType) => async () => {
-  const title = bondType === 'MAI' ? 'Bond MAI' : 'Bond CLAM/MAI'
+  let title
+  switch (bondType) {
+    case 'MAI':
+      title = 'Bond MAI'
+      break
+    case 'MAI_CLAM':
+      title = 'Bond CLAM/MAI'
+      break
+    case 'FRAX':
+      title = 'Bond FRAX'
+      break
+    default:
+      throw Error(`bond type ${bondType} not supported`)
+  }
   try {
     const rawBondPrice = await getRawBondPrice(bondType)
     const price = Number(rawBondPrice / 1e18).toFixed(2)
@@ -92,6 +106,11 @@ const bondbotMAI_CLAM = sidebarFactory({
   interval: UPDATE_INTERVAL,
   setSidebar: makeRebaseSidebar('MAI_CLAM'),
 })
+const bondbotFRAX = sidebarFactory({
+  token: DISCORD_BOND_FRAX_BOT_TOKEN,
+  interval: UPDATE_INTERVAL,
+  setSidebar: makeRebaseSidebar('FRAX'),
+})
 
 const rebasebot = sidebarFactory({
   token: DISCORD_REBASE_BOT_TOKEN,
@@ -111,7 +130,13 @@ const rebasebot = sidebarFactory({
 })
 
 const main = async () => {
-  await Promise.all([pricebot(), bondbotMAI(), bondbotMAI_CLAM(), rebasebot()])
+  await Promise.all([
+    pricebot(),
+    bondbotMAI(),
+    bondbotMAI_CLAM(),
+    bondbotFRAX(),
+    rebasebot(),
+  ])
 }
 
 main().catch((error) => {

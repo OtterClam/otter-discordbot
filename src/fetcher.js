@@ -2,6 +2,7 @@ const { ethers, BigNumber } = require('ethers')
 const {
   MimTimeReserveContract,
   OtterBondDepository,
+  OtterBondStakeDepository,
   StakingContract,
   ClamTokenContract,
   ClamCirculatingSupply,
@@ -10,19 +11,51 @@ const {
   RESERVE_MAI_CLAM,
   BOND_MAI_CLAM,
   BOND_MAI,
+  BOND_FRAX,
   STAKING_ADDRESS,
   CLAM_ADDRESS,
   CLAM_CIRCULATING_SUPPLY,
 } = require('./constant')
 
-const provider = new ethers.providers.JsonRpcProvider('https://rpc-mainnet.maticvigil.com/')
-const bondContractMAI_CLAM = new ethers.Contract(BOND_MAI_CLAM, OtterBondDepository, provider)
-const bondContractMAI = new ethers.Contract(BOND_MAI, OtterBondDepository, provider)
-const pairContract = new ethers.Contract(RESERVE_MAI_CLAM, MimTimeReserveContract, provider)
-const clamContract = new ethers.Contract(CLAM_ADDRESS, ClamTokenContract, provider)
-const clamCirculatingSupply = new ethers.Contract(CLAM_CIRCULATING_SUPPLY, ClamCirculatingSupply, provider)
+const provider = new ethers.providers.JsonRpcProvider(
+  'https://rpc-mainnet.maticvigil.com/',
+)
 
-const stakingContract = new ethers.Contract(STAKING_ADDRESS, StakingContract, provider)
+const bondContractMAI_CLAM = new ethers.Contract(
+  BOND_MAI_CLAM,
+  OtterBondDepository,
+  provider,
+)
+const bondContractMAI = new ethers.Contract(
+  BOND_MAI,
+  OtterBondDepository,
+  provider,
+)
+const bondContractFRAX = new ethers.Contract(
+  BOND_FRAX,
+  OtterBondStakeDepository,
+  provider,
+)
+const pairContract = new ethers.Contract(
+  RESERVE_MAI_CLAM,
+  MimTimeReserveContract,
+  provider,
+)
+const clamContract = new ethers.Contract(
+  CLAM_ADDRESS,
+  ClamTokenContract,
+  provider,
+)
+const clamCirculatingSupply = new ethers.Contract(
+  CLAM_CIRCULATING_SUPPLY,
+  ClamCirculatingSupply,
+  provider,
+)
+const stakingContract = new ethers.Contract(
+  STAKING_ADDRESS,
+  StakingContract,
+  provider,
+)
 const getRawMarketPrice = async () => {
   const reserves = await pairContract.getReserves()
   const [clam, mai] = BigNumber.from(RESERVE_MAI_CLAM).gt(CLAM_ADDRESS)
@@ -35,6 +68,7 @@ const getRawMarketPrice = async () => {
 const getRawBondPrice = async (bondType) => {
   if (bondType === 'MAI') return bondContractMAI.bondPriceInUSD()
   if (bondType === 'MAI_CLAM') return bondContractMAI_CLAM.bondPriceInUSD()
+  if (bondType === 'FRAX') return bondContractFRAX.bondPriceInUSD()
   throw Error(`Contract for bond doesn't support: ${bondType}`)
 }
 
