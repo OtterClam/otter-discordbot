@@ -7,7 +7,10 @@ const sidebarFactory = (opts) => {
   const loop = () => {
     const loopAsync = async () => {
       const { title, activity } = await setSidebar()
-      await Promise.all([bot.user.setActivity(activity), bot.guilds.cache.map((guild) => guild.me.setNickname(title))])
+      await Promise.all([
+        bot.user.setActivity(activity),
+        bot.guilds.cache.map((guild) => guild.me.setNickname(title)),
+      ])
     }
     loopAsync().catch(console.error)
   }

@@ -1,4 +1,9 @@
-const { utcClock, prettifySeconds, priceArrow, commaPrice } = require('./utils.js')
+const {
+  utcClock,
+  prettifySeconds,
+  priceArrow,
+  commaPrice,
+} = require('./utils.js')
 
 describe('commaPrice', () => {
   it.each([
@@ -21,9 +26,12 @@ describe('priceArrow', () => {
     { price: 100, pastPrice: 0, pastArrow: '↘', expected: '↗' },
     { price: 100, pastPrice: 100, pastArrow: '↗', expected: '↗' },
     { price: 100, pastPrice: 100, pastArrow: '↘', expected: '↘' },
-  ])('$pastArrow $pastPrice $expected $price', ({ price, pastPrice, pastArrow, expected }) => {
-    expect(priceArrow(price, pastPrice, pastArrow)).toBe(expected)
-  })
+  ])(
+    '$pastArrow $pastPrice $expected $price',
+    ({ price, pastPrice, pastArrow, expected }) => {
+      expect(priceArrow(price, pastPrice, pastArrow)).toBe(expected)
+    },
+  )
 })
 
 describe('prettifySeconds', () => {

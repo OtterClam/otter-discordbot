@@ -17,7 +17,12 @@ const {
   getEpoch,
 } = require('../src/fetcher')
 const { sidebarFactory } = require('../src/sidebar')
-const { commaPrice, priceArrow, prettifySeconds, utcClock } = require('../src/utils')
+const {
+  commaPrice,
+  priceArrow,
+  prettifySeconds,
+  utcClock,
+} = require('../src/utils')
 
 let pastPriceBuf = 0
 let pastArrow = ''
