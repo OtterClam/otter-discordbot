@@ -1,9 +1,10 @@
 const { ethers, BigNumber } = require('ethers')
 const {
-  MimTimeReserveContract,
   OtterBondDepository,
   OtterBondStakeDepository,
   StakingContract,
+  StakedClamTokenContract,
+  ClamMaiContract,
   ClamTokenContract,
   ClamCirculatingSupply,
 } = require('./abi')
@@ -13,6 +14,7 @@ const {
   BOND_MAI,
   BOND_FRAX,
   STAKING_ADDRESS,
+  sCLAM_ADDRESS,
   CLAM_ADDRESS,
   CLAM_CIRCULATING_SUPPLY,
 } = require('./constant')
@@ -38,9 +40,15 @@ const bondContractFRAX = new ethers.Contract(
 )
 const pairContract = new ethers.Contract(
   RESERVE_MAI_CLAM,
-  MimTimeReserveContract,
+  ClamMaiContract,
   provider,
 )
+const sCLAMContract = new ethers.Contract(
+  sCLAM_ADDRESS,
+  StakedClamTokenContract,
+  provider,
+)
+
 const clamContract = new ethers.Contract(
   CLAM_ADDRESS,
   ClamTokenContract,
@@ -77,6 +85,15 @@ const getBondROI = async (bondType, rawPrice) => {
   const rawBondPrice = rawPrice || (await getRawBondPrice(bondType))
   const bondDiscount = (rawMarketPrice * 1e9 - rawBondPrice) / rawBondPrice
   return Number(100 * bondDiscount).toFixed(2)
+}
+
+const getBondFiveDayROI = async () => {
+  const sClamCirc = (await sCLAMContract.circulatingSupply()) / 1e9
+  const epoch = await stakingContract.epoch()
+  const stakingReward = epoch.distribute / 1e9
+  const stakingRebase = stakingReward / sClamCirc
+  const fiveDayRate = Math.pow(1 + stakingRebase, 5 * 3) - 1
+  return Number(100 * fiveDayRate).toFixed(2)
 }
 
 const getRawStakingBalance = async () => {
@@ -125,4 +142,5 @@ module.exports = {
   getMarketPrice,
   getStakingTVL,
   getBondROI,
+  getBondFiveDayROI,
 }

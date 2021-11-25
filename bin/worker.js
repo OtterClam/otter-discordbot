@@ -16,6 +16,7 @@ const {
   getRawBondPrice,
   getBondROI,
   getEpoch,
+  getBondFiveDayROI,
 } = require('../src/fetcher')
 const { sidebarFactory } = require('../src/sidebar')
 const {
@@ -71,7 +72,7 @@ const makeRebaseSidebar = (bondType) => async () => {
       title = 'Bond CLAM/MAI'
       break
     case 'FRAX':
-      title = 'Bond FRAX'
+      title = 'Bond FRAX (4,4)'
       break
     default:
       throw Error(`bond type ${bondType} not supported`)
@@ -80,7 +81,13 @@ const makeRebaseSidebar = (bondType) => async () => {
     const rawBondPrice = await getRawBondPrice(bondType)
     const price = Number(rawBondPrice / 1e18).toFixed(2)
     const roi = await getBondROI(process.argv[2], rawBondPrice)
-    const activity = `$${price} ROI: ${roi}%`
+    let activity
+    if (bondType === 'FRAX') {
+      const fiveDayROI = await getBondFiveDayROI()
+      activity = `$${price} ${roi}%+${fiveDayROI}%`
+    } else {
+      activity = `$${price} ROI: ${roi}%`
+    }
     console.log(`bondbot  : ${activity} ${bondType}`)
     return {
       title,
