@@ -4,6 +4,7 @@ const {
   DISCORD_PRICE_BOT_TOKEN,
   DISCORD_BOND_MAI_CLAM_BOT_TOKEN,
   DISCORD_BOND_MAI_BOT_TOKEN,
+  DISCORD_BOND_MAI44_BOT_TOKEN,
   DISCORD_BOND_FRAX_BOT_TOKEN,
   UPDATE_INTERVAL,
 } = process.env
@@ -68,6 +69,9 @@ const makeRebaseSidebar = (bondType) => async () => {
     case 'MAI':
       title = 'Bond MAI'
       break
+    case 'MAI44':
+      title = 'Bond MAI (4,4)'
+      break
     case 'MAI_CLAM':
       title = 'Bond CLAM/MAI'
       break
@@ -77,12 +81,13 @@ const makeRebaseSidebar = (bondType) => async () => {
     default:
       throw Error(`bond type ${bondType} not supported`)
   }
+
   try {
     const rawBondPrice = await getRawBondPrice(bondType)
     const price = Number(rawBondPrice / 1e18).toFixed(2)
     const roi = await getBondROI(process.argv[2], rawBondPrice)
     let activity
-    if (bondType === 'FRAX') {
+    if (['MAI44', 'FRAX'].includes(bondType)) {
       const fiveDayROI = await getBondFiveDayROI()
       activity = `$${price} ${roi}%+${fiveDayROI}%`
     } else {
@@ -118,6 +123,11 @@ const bondbotFRAX = sidebarFactory({
   interval: UPDATE_INTERVAL,
   setSidebar: makeRebaseSidebar('FRAX'),
 })
+const bondbotMAI44 = sidebarFactory({
+  token: DISCORD_BOND_MAI44_BOT_TOKEN,
+  interval: UPDATE_INTERVAL,
+  setSidebar: makeRebaseSidebar('MAI44'),
+})
 
 const rebasebot = sidebarFactory({
   token: DISCORD_REBASE_BOT_TOKEN,
@@ -142,6 +152,7 @@ const main = async () => {
     bondbotMAI(),
     bondbotMAI_CLAM(),
     bondbotFRAX(),
+    bondbotMAI44(),
     rebasebot(),
   ])
 }
