@@ -13,7 +13,7 @@ const {
   BOND_MAI_CLAM,
   BOND_MAI,
   BOND_MAI44,
-  BOND_FRAX,
+  BOND_FRAX44,
   STAKING_ADDRESS,
   sCLAM_ADDRESS,
   CLAM_ADDRESS,
@@ -39,8 +39,8 @@ const bondContractMAI44 = new ethers.Contract(
   OtterBondStakeDepository,
   provider,
 )
-const bondContractFRAX = new ethers.Contract(
-  BOND_FRAX,
+const bondContractFRAX44 = new ethers.Contract(
+  BOND_FRAX44,
   OtterBondStakeDepository,
   provider,
 )
@@ -83,7 +83,7 @@ const getRawBondPrice = async (bondType) => {
   if (bondType === 'MAI') return bondContractMAI.bondPriceInUSD()
   if (bondType === 'MAI44') return bondContractMAI44.bondPriceInUSD()
   if (bondType === 'MAI_CLAM') return bondContractMAI_CLAM.bondPriceInUSD()
-  if (bondType === 'FRAX') return bondContractFRAX.bondPriceInUSD()
+  if (bondType === 'FRAX44') return bondContractFRAX44.bondPriceInUSD()
   throw Error(`Contract for bond doesn't support: ${bondType}`)
 }
 

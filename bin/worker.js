@@ -5,7 +5,7 @@ const {
   DISCORD_BOND_MAI_CLAM_BOT_TOKEN,
   DISCORD_BOND_MAI_BOT_TOKEN,
   DISCORD_BOND_MAI44_BOT_TOKEN,
-  DISCORD_BOND_FRAX_BOT_TOKEN,
+  DISCORD_BOND_FRAX44_BOT_TOKEN,
   UPDATE_INTERVAL,
 } = process.env
 const {
@@ -75,7 +75,7 @@ const makeRebaseSidebar = (bondType) => async () => {
     case 'MAI_CLAM':
       title = 'Bond CLAM/MAI'
       break
-    case 'FRAX':
+    case 'FRAX44':
       title = 'Bond FRAX (4,4)'
       break
     default:
@@ -87,7 +87,7 @@ const makeRebaseSidebar = (bondType) => async () => {
     const price = Number(rawBondPrice / 1e18).toFixed(2)
     const roi = await getBondROI(process.argv[2], rawBondPrice)
     let activity
-    if (['MAI44', 'FRAX'].includes(bondType)) {
+    if (['MAI44', 'FRAX44'].includes(bondType)) {
       const fiveDayROI = await getBondFiveDayROI()
       activity = `$${price} ${roi}%+${fiveDayROI}%`
     } else {
@@ -118,10 +118,10 @@ const bondbotMAI_CLAM = sidebarFactory({
   interval: UPDATE_INTERVAL,
   setSidebar: makeRebaseSidebar('MAI_CLAM'),
 })
-const bondbotFRAX = sidebarFactory({
-  token: DISCORD_BOND_FRAX_BOT_TOKEN,
+const bondbotFRAX44 = sidebarFactory({
+  token: DISCORD_BOND_FRAX44_BOT_TOKEN,
   interval: UPDATE_INTERVAL,
-  setSidebar: makeRebaseSidebar('FRAX'),
+  setSidebar: makeRebaseSidebar('FRAX44'),
 })
 const bondbotMAI44 = sidebarFactory({
   token: DISCORD_BOND_MAI44_BOT_TOKEN,
@@ -151,7 +151,7 @@ const main = async () => {
     pricebot(),
     bondbotMAI(),
     bondbotMAI_CLAM(),
-    bondbotFRAX(),
+    bondbotFRAX44(),
     bondbotMAI44(),
     rebasebot(),
   ])
