@@ -3,7 +3,7 @@ const commaPrice = (x) => {
 }
 
 const priceArrow = (price, pastPrice, pastArrow) => {
-  return price === pastPrice ? pastArrow : price > pastPrice ? '↗' : '↘'
+  return price === pastPrice ? pastArrow : price > pastPrice ? '(↗)' : '(↘)'
 }
 
 const prettifySeconds = (seconds) => {
