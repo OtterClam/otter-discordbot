@@ -85,7 +85,7 @@ const makeRebaseSidebar = (bondType) => async () => {
     let activity
     if (['MAI44', 'FRAX44'].includes(bondType)) {
       const fiveDayROI = await getBondFiveDayROI()
-      const totalROI = Number(roi) + Number(fiveDayROI)
+      const totalROI = (Number(roi) + Number(fiveDayROI)).toFixed(2)
       activity = `$${price} ROI: ${totalROI}%`
     } else {
       activity = `$${price} ROI: ${roi}%`
