@@ -66,7 +66,7 @@ const makeRebaseSidebar = (bondType) => async () => {
   let title
   switch (bondType) {
     case 'MAI_CLAM':
-      title = 'Bond CLAM/MAI'
+      title = 'Bond MAI/CLAM'
       break
     case 'MAI44':
       title = 'Bond MAI (4,4)'
