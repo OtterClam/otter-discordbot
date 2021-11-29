@@ -11,9 +11,9 @@ const {
 const {
   RESERVE_MAI_CLAM,
   BOND_MAI_CLAM,
-  BOND_MAI,
   BOND_MAI44,
   BOND_FRAX44,
+  BOND_MAI_CLAM44,
   STAKING_ADDRESS,
   sCLAM_ADDRESS,
   CLAM_ADDRESS,
@@ -24,16 +24,6 @@ const provider = new ethers.providers.JsonRpcProvider(
   'https://rpc-mainnet.maticvigil.com/',
 )
 
-const bondContractMAI_CLAM = new ethers.Contract(
-  BOND_MAI_CLAM,
-  OtterBondDepository,
-  provider,
-)
-const bondContractMAI = new ethers.Contract(
-  BOND_MAI,
-  OtterBondDepository,
-  provider,
-)
 const bondContractMAI44 = new ethers.Contract(
   BOND_MAI44,
   OtterBondStakeDepository,
@@ -42,6 +32,16 @@ const bondContractMAI44 = new ethers.Contract(
 const bondContractFRAX44 = new ethers.Contract(
   BOND_FRAX44,
   OtterBondStakeDepository,
+  provider,
+)
+const bondContractMAI_CLAM = new ethers.Contract(
+  BOND_MAI_CLAM,
+  OtterBondDepository,
+  provider,
+)
+const bondContractMAI_CLAM44 = new ethers.Contract(
+  BOND_MAI_CLAM44,
+  OtterBondDepository,
   provider,
 )
 const pairContract = new ethers.Contract(
@@ -80,10 +80,10 @@ const getRawMarketPrice = async () => {
 }
 
 const getRawBondPrice = async (bondType) => {
-  if (bondType === 'MAI') return bondContractMAI.bondPriceInUSD()
   if (bondType === 'MAI44') return bondContractMAI44.bondPriceInUSD()
-  if (bondType === 'MAI_CLAM') return bondContractMAI_CLAM.bondPriceInUSD()
   if (bondType === 'FRAX44') return bondContractFRAX44.bondPriceInUSD()
+  if (bondType === 'MAI_CLAM') return bondContractMAI_CLAM.bondPriceInUSD()
+  if (bondType === 'MAI_CLAM44') return bondContractMAI_CLAM44.bondPriceInUSD()
   throw Error(`Contract for bond doesn't support: ${bondType}`)
 }
 
