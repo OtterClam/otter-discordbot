@@ -155,7 +155,9 @@ const getEpoch = async () => {
 }
 
 const getTotalSupply = async () => {
-  return Number((await clamContract.totalSupply()) / 1e9).toFixed(0)
+  return Number(
+    (await clamCirculatingSupply.CLAMCirculatingSupply()) / 1e9,
+  ).toFixed(0)
 }
 
 const getStakingTVL = async (rawPrice) => {
