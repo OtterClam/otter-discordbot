@@ -2,10 +2,10 @@ require('dotenv').config()
 const {
   DISCORD_REBASE_BOT_TOKEN,
   DISCORD_PRICE_BOT_TOKEN,
-  DISCORD_BOND_MAI_CLAM_BOT_TOKEN,
   DISCORD_BOND_MAI44_BOT_TOKEN,
-  DISCORD_BOND_MAI_CLAM44_BOT_TOKEN,
   DISCORD_BOND_FRAX44_BOT_TOKEN,
+  DISCORD_BOND_MAI_CLAM44_BOT_TOKEN,
+  DISCORD_BOND_FRAX_CLAM44_BOT_TOKEN,
   UPDATE_INTERVAL,
 } = process.env
 const {
@@ -14,8 +14,7 @@ const {
   getRawMarketPrice,
   getMarketCap,
   getTotalSupply,
-  getRawBondPrice,
-  getBondROI,
+  getBondInfo,
   getEpoch,
   getBondFiveDayROI,
 } = require('../src/fetcher')
@@ -63,71 +62,49 @@ const pricebot = sidebarFactory({
   },
 })
 
-const makeRebaseSidebar = (bondType) => async () => {
-  let title
-  switch (bondType) {
-    case 'MAI_CLAM':
-      title = 'MAI/CLAM'
-      break
-    case 'MAI_CLAM44':
-      title = 'MAI/CLAM (4,4)'
-      break
-    case 'MAI44':
-      title = 'MAI (4,4)'
-      break
-    case 'FRAX44':
-      title = 'FRAX (4,4)'
-      break
-    default:
-      throw Error(`bond type ${bondType} not supported`)
-  }
-
+const makeBondSidebar = (bondType) => async () => {
+  let title,
+    activity,
+    err = ''
   try {
-    const rawBondPrice = await getRawBondPrice(bondType)
-    const price = Number(rawBondPrice / 1e18).toFixed(2)
-    const roi = await getBondROI(process.argv[2], rawBondPrice)
-    let activity
-    if (['MAI44', 'FRAX44', 'MAI_CLAM44'].includes(bondType)) {
-      const fiveDayROI = await getBondFiveDayROI()
-      const totalROI = (Number(roi) + Number(fiveDayROI)).toFixed(2)
-      activity = `$${price} ROI: ${totalROI}%`
-    } else {
-      activity = `$${price} ROI: ${roi}%`
-    }
-    console.log(`bondbot  : ${activity} ${bondType}`)
-    return {
-      title,
-      activity,
-    }
+    const [info, fiveDayROI] = await Promise.all([
+      getBondInfo(bondType),
+      getBondFiveDayROI(),
+    ])
+    const totalROI = (Number(info.roi) + Number(fiveDayROI)).toFixed(2)
+    title = info.title
+    activity = `$${info.price} ROI: ${totalROI}%`
   } catch (e) {
-    const activity = `$0 ROI: $0%`
-    console.log(`bondbot  : ${activity} ${bondType}`)
-    return {
-      title,
-      activity,
-    }
+    title = 'Upcoming ...'
+    activity = `$0 ROI: 0%`
+    err = `${e}`
+  }
+  console.log(`bondbot  : ${activity} ${bondType} ${err}`)
+  return {
+    title,
+    activity,
   }
 }
 
-const bondbotMAI_CLAM = sidebarFactory({
-  token: DISCORD_BOND_MAI_CLAM_BOT_TOKEN,
-  interval: UPDATE_INTERVAL,
-  setSidebar: makeRebaseSidebar('MAI_CLAM'),
-})
 const bondbotFRAX44 = sidebarFactory({
   token: DISCORD_BOND_FRAX44_BOT_TOKEN,
   interval: UPDATE_INTERVAL,
-  setSidebar: makeRebaseSidebar('FRAX44'),
+  setSidebar: makeBondSidebar('FRAX44'),
 })
 const bondbotMAI44 = sidebarFactory({
   token: DISCORD_BOND_MAI44_BOT_TOKEN,
   interval: UPDATE_INTERVAL,
-  setSidebar: makeRebaseSidebar('MAI44'),
+  setSidebar: makeBondSidebar('MAI44'),
 })
 const bondbotMAI_CLAM44 = sidebarFactory({
   token: DISCORD_BOND_MAI_CLAM44_BOT_TOKEN,
   interval: UPDATE_INTERVAL,
-  setSidebar: makeRebaseSidebar('MAI_CLAM44'),
+  setSidebar: makeBondSidebar('MAI_CLAM44'),
+})
+const bondbotFRAX_CLAM44 = sidebarFactory({
+  token: DISCORD_BOND_FRAX_CLAM44_BOT_TOKEN,
+  interval: UPDATE_INTERVAL,
+  setSidebar: makeBondSidebar('FRAX_CLAM44'),
 })
 
 const rebasebot = sidebarFactory({
@@ -152,8 +129,8 @@ const main = async () => {
     pricebot(),
     bondbotFRAX44(),
     bondbotMAI44(),
-    bondbotMAI_CLAM(),
     bondbotMAI_CLAM44(),
+    bondbotFRAX_CLAM44(),
     rebasebot(),
   ])
 }

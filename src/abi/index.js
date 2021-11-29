@@ -1,5 +1,5 @@
 module.exports = {
-  ClamMaiContract: require('./ClamMaiContract.json').abi,
+  UniswapV2Pair: require('./UniswapV2Pair.json').abi,
   OtterBondDepository: require('./OtterBondDepository.json').abi,
   OtterBondStakeDepository: require('./OtterBondStakeDepository.json').abi,
   StakingContract: require('./StakingContract.json').abi,
