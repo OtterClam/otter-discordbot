@@ -67,16 +67,16 @@ const makeRebaseSidebar = (bondType) => async () => {
   let title
   switch (bondType) {
     case 'MAI_CLAM':
-      title = 'Bond MAI/CLAM'
+      title = 'MAI/CLAM'
       break
     case 'MAI_CLAM44':
-      title = 'Bond MAI/CLAM (4,4)'
+      title = 'MAI/CLAM (4,4)'
       break
     case 'MAI44':
-      title = 'Bond MAI (4,4)'
+      title = 'MAI (4,4)'
       break
     case 'FRAX44':
-      title = 'Bond FRAX (4,4)'
+      title = 'FRAX (4,4)'
       break
     default:
       throw Error(`bond type ${bondType} not supported`)
