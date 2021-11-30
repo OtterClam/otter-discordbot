@@ -50,7 +50,7 @@ const pricebot = sidebarFactory({
       activity = `MarketCap: $${marketCap}`
     } else {
       const TotalSupply = commaPrice(await getTotalSupply())
-      activity = `TotalSupply: ${TotalSupply}`
+      activity = `CircSupply: ${TotalSupply}`
     }
     console.log(`pricebot : ${pastPrice} ${arrow} ${price}, ${activity}`)
     count++
