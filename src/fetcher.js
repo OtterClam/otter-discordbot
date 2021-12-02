@@ -5,7 +5,6 @@ const {
   StakingContract,
   StakedClamTokenContract,
   UniswapV2Pair,
-  ClamTokenContract,
   ClamCirculatingSupply,
 } = require('./abi')
 const {
@@ -61,11 +60,6 @@ const sCLAMContract = new ethers.Contract(
   provider,
 )
 
-const clamContract = new ethers.Contract(
-  CLAM_ADDRESS,
-  ClamTokenContract,
-  provider,
-)
 const clamCirculatingSupply = new ethers.Contract(
   CLAM_CIRCULATING_SUPPLY,
   ClamCirculatingSupply,
@@ -111,7 +105,8 @@ const bondTypeToCoinType = {
   FRAX44: 'MAI',
   // FRAX44: 'FRAX',
   MAI_CLAM44: 'MAI',
-  FRAX_CLAM44: 'FRAX',
+  // FRAX_CLAM44: 'FRAX',
+  FRAX_CLAM44: 'MAI',
 }
 const getRawBondPrice = async (bondType) => {
   if (bondContract[bondType] === undefined)
