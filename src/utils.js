@@ -1,4 +1,4 @@
-const commaPrice = (x) => {
+const commaNumber = (x) => {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
 
@@ -29,7 +29,7 @@ const utcClock = (t) => {
 }
 
 module.exports = {
-  commaPrice,
+  commaNumber,
   priceArrow,
   prettifySeconds,
   utcClock,

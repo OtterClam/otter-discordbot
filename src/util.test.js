@@ -2,10 +2,10 @@ const {
   utcClock,
   prettifySeconds,
   priceArrow,
-  commaPrice,
+  commaNumber,
 } = require('./utils.js')
 
-describe('commaPrice', () => {
+describe('commaNumber', () => {
   it.each([
     { n: 1, expected: '1' },
     { n: 100, expected: '100' },
@@ -14,7 +14,7 @@ describe('commaPrice', () => {
     { n: 1000000000, expected: '1,000,000,000' },
     { n: 1000000000.999, expected: '1,000,000,000.999' },
   ])('$n -> $expected', ({ n, expected }) => {
-    expect(commaPrice(n)).toBe(expected)
+    expect(commaNumber(n)).toBe(expected)
   })
 })
 

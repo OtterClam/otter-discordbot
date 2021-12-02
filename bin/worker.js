@@ -8,23 +8,19 @@ const {
   DISCORD_BOND_FRAX_CLAM44_BOT_TOKEN,
   UPDATE_INTERVAL,
 } = process.env
+const { getBondInfo, getRebaseInfo, getPriceInfo } = require('../src/usecase')
+
 const {
-  getMarketPrice,
-  getStakingTVL,
-  getRawMarketPrice,
-  getMarketCap,
-  getTotalSupply,
-  getBondInfo,
-  getEpoch,
-  getBondFiveDayROI,
-} = require('../src/fetcher')
+  bondContract_MAI44,
+  bondContract_FRAX44,
+  bondContract_MAI_CLAM44,
+  bondContract_FRAX_CLAM44,
+  pairContract_MAI_CLAM,
+} = require('../src/contract')
+
+const { RESERVE_MAI_CLAM } = require('../src/constant')
 const { sidebarFactory } = require('../src/sidebar')
-const {
-  commaPrice,
-  priceArrow,
-  prettifySeconds,
-  utcClock,
-} = require('../src/utils')
+const { priceArrow, prettifySeconds, utcClock } = require('../src/utils')
 
 let pastPriceBuf = 0
 let pastArrow = ''
@@ -34,8 +30,7 @@ const pricebot = sidebarFactory({
   interval: UPDATE_INTERVAL,
   setSidebar: async () => {
     const pastPrice = pastPriceBuf
-    const rawPrice = await getRawMarketPrice()
-    const price = await getMarketPrice(rawPrice)
+    const { price, tvl, marketCap, totalSupply } = await getPriceInfo({})
     pastPriceBuf = price
 
     const arrow = priceArrow(price, pastPrice, pastArrow)
@@ -43,14 +38,11 @@ const pricebot = sidebarFactory({
 
     let activity
     if (count % 3 == 0) {
-      const tvl = commaPrice(await getStakingTVL(rawPrice))
       activity = `TVL: $${tvl}`
     } else if (count % 3 == 1) {
-      const marketCap = commaPrice(await getMarketCap(rawPrice))
       activity = `MarketCap: $${marketCap}`
     } else {
-      const TotalSupply = commaPrice(await getTotalSupply())
-      activity = `CircSupply: ${TotalSupply}`
+      activity = `CircSupply: ${totalSupply}`
     }
     console.log(`pricebot : ${pastPrice} ${arrow} ${price}, ${activity}`)
     count++
@@ -62,56 +54,72 @@ const pricebot = sidebarFactory({
   },
 })
 
-const makeBondSidebar = (bondType) => async () => {
-  let title,
-    activity,
-    err = ''
-  try {
-    const [info, fiveDayROI] = await Promise.all([
-      getBondInfo(bondType),
-      getBondFiveDayROI(),
-    ])
-    const totalROI = (Number(info.roi) + Number(fiveDayROI)).toFixed(2)
-    title = info.title
-    activity = `$${info.price} ROI: ${totalROI}%`
-  } catch (e) {
-    title = 'Upcoming ...'
-    activity = `$0 ROI: 0%`
-    err = `${e}`
-  }
-  console.log(`bondbot  : ${activity} ${bondType} ${err}`)
-  return {
-    title,
-    activity,
-  }
-}
-
-const bondbotFRAX44 = sidebarFactory({
+const bondbot_FRAX44 = sidebarFactory({
   token: DISCORD_BOND_FRAX44_BOT_TOKEN,
   interval: UPDATE_INTERVAL,
-  setSidebar: makeBondSidebar('FRAX44'),
+  setSidebar: async () => {
+    const { roi, price } = await getBondInfo({
+      bondContract: bondContract_FRAX44,
+      pairContract: pairContract_MAI_CLAM,
+      assetAddress: RESERVE_MAI_CLAM,
+    })
+    const title = 'FRAX (4,4)'
+    const activity = `$${price} ROI: ${roi}%`
+    console.log(`frax     : ${activity}`)
+    return { title, activity }
+  },
 })
-const bondbotMAI44 = sidebarFactory({
+const bondbot_MAI44 = sidebarFactory({
   token: DISCORD_BOND_MAI44_BOT_TOKEN,
   interval: UPDATE_INTERVAL,
-  setSidebar: makeBondSidebar('MAI44'),
+  setSidebar: async () => {
+    const { roi, price } = await getBondInfo({
+      bondContract: bondContract_MAI44,
+      pairContract: pairContract_MAI_CLAM,
+      assetAddress: RESERVE_MAI_CLAM,
+    })
+    const title = 'MAI (4,4)'
+    const activity = `$${price} ROI: ${roi}%`
+    console.log(`mai      : ${activity}`)
+    return { title, activity }
+  },
 })
-const bondbotMAI_CLAM44 = sidebarFactory({
+const bondbot_MAI_CLAM44 = sidebarFactory({
   token: DISCORD_BOND_MAI_CLAM44_BOT_TOKEN,
   interval: UPDATE_INTERVAL,
-  setSidebar: makeBondSidebar('MAI_CLAM44'),
+  setSidebar: async () => {
+    const { roi, price } = await getBondInfo({
+      bondContract: bondContract_MAI_CLAM44,
+      pairContract: pairContract_MAI_CLAM,
+      assetAddress: RESERVE_MAI_CLAM,
+    })
+    const title = 'MAI/CLAM (4,4)'
+    const activity = `$${price} ROI: ${roi}%`
+    console.log(`mai/clam : ${activity}`)
+    return { title, activity }
+  },
 })
-const bondbotFRAX_CLAM44 = sidebarFactory({
+const bondbot_FRAX_CLAM44 = sidebarFactory({
   token: DISCORD_BOND_FRAX_CLAM44_BOT_TOKEN,
   interval: UPDATE_INTERVAL,
-  setSidebar: makeBondSidebar('FRAX_CLAM44'),
+  setSidebar: async () => {
+    const { roi, price } = await getBondInfo({
+      bondContract: bondContract_FRAX_CLAM44,
+      pairContract: pairContract_MAI_CLAM,
+      assetAddress: RESERVE_MAI_CLAM,
+    })
+    const title = 'FRAX/CLAM (4,4)'
+    const activity = `$${price} ROI: ${roi}%`
+    console.log(`frax/clam: ${activity}`)
+    return { title, activity }
+  },
 })
 
 const rebasebot = sidebarFactory({
   token: DISCORD_REBASE_BOT_TOKEN,
   interval: UPDATE_INTERVAL,
   setSidebar: async () => {
-    const { epoch, currentBlockTime, currentEndTime } = await getEpoch()
+    const { epoch, currentBlockTime, currentEndTime } = await getRebaseInfo()
 
     const nextRebaseIn = prettifySeconds(currentEndTime - currentBlockTime)
     const clock = utcClock(new Date(currentBlockTime * 1000))
@@ -127,10 +135,10 @@ const rebasebot = sidebarFactory({
 const main = async () => {
   await Promise.all([
     pricebot(),
-    bondbotFRAX44(),
-    bondbotMAI44(),
-    bondbotMAI_CLAM44(),
-    bondbotFRAX_CLAM44(),
+    bondbot_FRAX44(),
+    bondbot_MAI44(),
+    bondbot_MAI_CLAM44(),
+    bondbot_FRAX_CLAM44(),
     rebasebot(),
   ])
 }
