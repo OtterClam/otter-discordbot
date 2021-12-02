@@ -1,89 +1,42 @@
-const { ethers, BigNumber } = require('ethers')
+const { BigNumber } = require('ethers')
 const {
-  OtterBondStakeDepository,
-  StakingContract,
-  StakedClamTokenContract,
-  UniswapV2Pair,
-  ClamCirculatingSupply,
-} = require('./abi')
+  provider,
+  bondContract_MAI44,
+  bondContract_FRAX44,
+  bondContract_MAI_CLAM44,
+  bondContract_FRAX_CLAM44,
+  pairContract_MAI_CLAM,
+  pairContract_FRAX_CLAM,
+  stakingContract,
+  sCLAM,
+  circulatingSupply_CLAM,
+} = require('./contract')
+
 const {
   RESERVE_MAI_CLAM,
   RESERVE_FRAX_CLAM,
-  BOND_MAI44,
-  BOND_FRAX44,
-  BOND_MAI_CLAM44,
-  BOND_FRAX_CLAM44,
-  STAKING_ADDRESS,
-  sCLAM_ADDRESS,
   CLAM_ADDRESS,
-  CLAM_CIRCULATING_SUPPLY,
 } = require('./constant')
 
-const provider = new ethers.providers.JsonRpcProvider(
-  'https://rpc-mainnet.maticvigil.com/',
-)
-
-const bondContractMAI44 = new ethers.Contract(
-  BOND_MAI44,
-  OtterBondStakeDepository,
-  provider,
-)
-const bondContractFRAX44 = new ethers.Contract(
-  BOND_FRAX44,
-  OtterBondStakeDepository,
-  provider,
-)
-const bondContractMAI_CLAM44 = new ethers.Contract(
-  BOND_MAI_CLAM44,
-  OtterBondStakeDepository,
-  provider,
-)
-const bondContractFRAX_CLAM44 = new ethers.Contract(
-  BOND_FRAX_CLAM44,
-  OtterBondStakeDepository,
-  provider,
-)
-const pairContractMAI_CLAM = new ethers.Contract(
-  RESERVE_MAI_CLAM,
-  UniswapV2Pair,
-  provider,
-)
-const pairContractFRAX_CLAM = new ethers.Contract(
-  RESERVE_FRAX_CLAM,
-  UniswapV2Pair,
-  provider,
-)
-const sCLAMContract = new ethers.Contract(
-  sCLAM_ADDRESS,
-  StakedClamTokenContract,
-  provider,
-)
-
-const clamCirculatingSupply = new ethers.Contract(
-  CLAM_CIRCULATING_SUPPLY,
-  ClamCirculatingSupply,
-  provider,
-)
-const stakingContract = new ethers.Contract(
-  STAKING_ADDRESS,
-  StakingContract,
-  provider,
-)
-
-const pairContractAndAddress = {
-  MAI: { contract: pairContractMAI_CLAM, address: RESERVE_MAI_CLAM },
-  FRAX: { contract: pairContractFRAX_CLAM, address: RESERVE_FRAX_CLAM },
+const coinToPairContract = {
+  MAI: pairContract_MAI_CLAM,
+  FRAX: pairContract_FRAX_CLAM,
 }
-const getRawMarketPrice = async (coinType = 'MAI') => {
-  const data = pairContractAndAddress[coinType]
-  if (data === undefined) throw Error(`Coin type not supported: ${coinType}`)
-  const { contract, address } = data
+const coinToAddress = {
+  MAI: RESERVE_MAI_CLAM,
+  FRAX: RESERVE_FRAX_CLAM,
+}
+const getRawMarketPrice = async (coin = 'MAI') => {
+  const pairContract = coinToPairContract[coin]
+  const address = coinToAddress[coin]
+  if (pairContract === undefined || address === undefined)
+    throw Error(`Coin type not supported: ${coin}`)
 
-  const reserves = await contract.getReserves()
-  const [clam, coin] = BigNumber.from(address).gt(CLAM_ADDRESS)
+  const reserves = await pairContract.getReserves()
+  const [p0, p1] = BigNumber.from(address).gt(CLAM_ADDRESS)
     ? [reserves[0], reserves[1]]
     : [reserves[1], reserves[0]]
-  const marketPrice = coin.div(clam)
+  const marketPrice = p1.div(p0)
   return marketPrice
 }
 
@@ -93,13 +46,13 @@ const bondTypeToTitle = {
   MAI_CLAM44: 'MAI/CLAM (4,4)',
   FRAX_CLAM44: 'FRAX/CLAM (4,4)',
 }
-const bondContract = {
-  MAI44: bondContractMAI44,
-  FRAX44: bondContractFRAX44,
-  MAI_CLAM44: bondContractMAI_CLAM44,
-  FRAX_CLAM44: bondContractFRAX_CLAM44,
+const bondToContract = {
+  MAI44: bondContract_MAI44,
+  FRAX44: bondContract_FRAX44,
+  MAI_CLAM44: bondContract_MAI_CLAM44,
+  FRAX_CLAM44: bondContract_FRAX_CLAM44,
 }
-const bondTypeToCoinType = {
+const bondToMarketCoin = {
   MAI44: 'MAI',
   FRAX44: 'MAI',
   // FRAX44: 'FRAX',
@@ -107,14 +60,14 @@ const bondTypeToCoinType = {
   // FRAX_CLAM44: 'FRAX',
   FRAX_CLAM44: 'MAI',
 }
-const getRawBondPrice = async (bondType) => {
-  if (bondContract[bondType] === undefined)
-    throw Error(`Contract type not supported: ${bondType}`)
-  return bondContract[bondType].bondPriceInUSD()
+const getRawBondPrice = async (bond) => {
+  if (bondToContract[bond] === undefined)
+    throw Error(`Contract type not supported: ${bond}`)
+  return bondToContract[bond].bondPriceInUSD()
 }
 const getBondInfo = async (bondType) => {
   const title = bondTypeToTitle[bondType]
-  const rawMarketPrice = await getRawMarketPrice(bondTypeToCoinType[bondType])
+  const rawMarketPrice = await getRawMarketPrice(bondToMarketCoin[bondType])
   const rawBondPrice = await getRawBondPrice(bondType)
   const bondDiscount = (rawMarketPrice * 1e9 - rawBondPrice) / rawBondPrice
   return {
@@ -125,7 +78,7 @@ const getBondInfo = async (bondType) => {
 }
 
 const getBondFiveDayROI = async () => {
-  const sClamCirc = (await sCLAMContract.circulatingSupply()) / 1e9
+  const sClamCirc = (await sCLAM.circulatingSupply()) / 1e9
   const epoch = await stakingContract.epoch()
   const stakingReward = epoch.distribute / 1e9
   const stakingRebase = stakingReward / sClamCirc
@@ -150,7 +103,7 @@ const getEpoch = async () => {
 
 const getTotalSupply = async () => {
   return Number(
-    (await clamCirculatingSupply.CLAMCirculatingSupply()) / 1e9,
+    (await circulatingSupply_CLAM.CLAMCirculatingSupply()) / 1e9,
   ).toFixed(0)
 }
 
@@ -162,7 +115,7 @@ const getStakingTVL = async (rawPrice) => {
 
 const getMarketCap = async (rawPrice) => {
   const rawMarketPrice = rawPrice || (await getRawMarketPrice())
-  const circSupply = await clamCirculatingSupply.CLAMCirculatingSupply()
+  const circSupply = await circulatingSupply_CLAM.CLAMCirculatingSupply()
   return Number((circSupply * rawMarketPrice) / 1e18).toFixed(0)
 }
 

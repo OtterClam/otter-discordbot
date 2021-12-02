@@ -1,8 +1,26 @@
+const { ethers } = require('ethers')
+
+const UniswapV2Pair = require('./UniswapV2Pair.json').abi
+const OtterBondStakeDepository = require('./OtterBondStakeDepository.json').abi
+const StakingContract = require('./StakingContract.json').abi
+const StakedClamTokenContract = require('./StakedClamTokenContract.json').abi
+const ClamCirculatingSupply = require('./ClamCirculatingSupply.json').abi
+
+const uniswapPairContract = (address, provider) =>
+  new ethers.Contract(address, UniswapV2Pair, provider)
+const bondContract = (address, provider) =>
+  new ethers.Contract(address, OtterBondStakeDepository, provider)
+const sClamStakingContract = (address, provider) =>
+  new ethers.Contract(address, StakingContract, provider)
+const sCLAMContract = (address, provider) =>
+  new ethers.Contract(address, StakedClamTokenContract, provider)
+const circulatingSupplyContract = (address, provider) =>
+  new ethers.Contract(address, ClamCirculatingSupply, provider)
+
 module.exports = {
-  UniswapV2Pair: require('./UniswapV2Pair.json').abi,
-  OtterBondStakeDepository: require('./OtterBondStakeDepository.json').abi,
-  StakingContract: require('./StakingContract.json').abi,
-  StakedClamTokenContract: require('./StakedClamTokenContract.json').abi,
-  ClamTokenContract: require('./ClamTokenContract.json').abi,
-  ClamCirculatingSupply: require('./ClamCirculatingSupply.json').abi,
+  uniswapPairContract,
+  bondContract,
+  sClamStakingContract,
+  sCLAMContract,
+  circulatingSupplyContract,
 }
