@@ -1,5 +1,5 @@
 require('dotenv').config()
-const { getTotalSupply } = require('../src/fetcher')
+const { getTotalSupply } = require('../src/usecase')
 
 const express = require('express')
 const app = express()
