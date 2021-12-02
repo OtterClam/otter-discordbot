@@ -1,6 +1,5 @@
 const { ethers, BigNumber } = require('ethers')
 const {
-  OtterBondDepository,
   OtterBondStakeDepository,
   StakingContract,
   StakedClamTokenContract,
@@ -36,12 +35,12 @@ const bondContractFRAX44 = new ethers.Contract(
 )
 const bondContractMAI_CLAM44 = new ethers.Contract(
   BOND_MAI_CLAM44,
-  OtterBondDepository,
+  OtterBondStakeDepository,
   provider,
 )
 const bondContractFRAX_CLAM44 = new ethers.Contract(
   BOND_FRAX_CLAM44,
-  OtterBondDepository,
+  OtterBondStakeDepository,
   provider,
 )
 const pairContractMAI_CLAM = new ethers.Contract(
