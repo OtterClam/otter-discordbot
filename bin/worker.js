@@ -1,3 +1,4 @@
+const { ethers } = require('ethers')
 require('dotenv').config()
 const {
   DISCORD_REBASE_BOT_TOKEN,
@@ -6,6 +7,7 @@ const {
   DISCORD_BOND_FRAX44_BOT_TOKEN,
   DISCORD_BOND_MAI_CLAM44_BOT_TOKEN,
   DISCORD_BOND_FRAX_CLAM44_BOT_TOKEN,
+  SLACK_WEBHOOK,
   UPDATE_INTERVAL,
 } = process.env
 
@@ -20,9 +22,15 @@ const {
 const { priceSidebar } = require('../src/price')
 const { bondSidebar } = require('../src/bond')
 const { rebaseSidebar } = require('../src/rebase')
+const { sendAttachment } = require('../src/slack')
 
 const { RESERVE_MAI_CLAM } = require('../src/constant')
 const { sidebarBotFactory } = require('../src/sidebarBot')
+
+const mai44BondName = 'MAI (4,4)'
+const frax44BondName = 'FRAX (4,4)'
+const maiclam44BondName = 'MAI/CLAM (4,4)'
+const fraxclam44BondName = 'FRAX/CLAM (4,4)'
 
 const main = async () => {
   await Promise.all([
@@ -35,7 +43,7 @@ const main = async () => {
       token: DISCORD_BOND_FRAX44_BOT_TOKEN,
       interval: UPDATE_INTERVAL,
       sidebar: bondSidebar(
-        'FRAX (4,4)',
+        frax44BondName,
         bondContract_FRAX44,
         pairContract_MAI_CLAM,
         RESERVE_MAI_CLAM,
@@ -45,7 +53,7 @@ const main = async () => {
       token: DISCORD_BOND_MAI44_BOT_TOKEN,
       interval: UPDATE_INTERVAL,
       sidebar: bondSidebar(
-        'MAI (4,4)',
+        mai44BondName,
         bondContract_MAI44,
         pairContract_MAI_CLAM,
         RESERVE_MAI_CLAM,
@@ -55,7 +63,7 @@ const main = async () => {
       token: DISCORD_BOND_MAI_CLAM44_BOT_TOKEN,
       interval: UPDATE_INTERVAL,
       sidebar: bondSidebar(
-        'MAI/CLAM (4,4)',
+        maiclam44BondName,
         bondContract_MAI_CLAM44,
         pairContract_MAI_CLAM,
         RESERVE_MAI_CLAM,
@@ -65,7 +73,7 @@ const main = async () => {
       token: DISCORD_BOND_FRAX_CLAM44_BOT_TOKEN,
       interval: UPDATE_INTERVAL,
       sidebar: bondSidebar(
-        'FRAX/CLAM (4,4)',
+        fraxclam44BondName,
         bondContract_FRAX_CLAM44,
         pairContract_MAI_CLAM,
         RESERVE_MAI_CLAM,
@@ -78,6 +86,51 @@ const main = async () => {
     })(),
   ])
 }
+
+const priceFormatter = Intl.NumberFormat('en', {
+  style: 'currency',
+  currency: 'usd',
+})
+const notifyBondCreated = (name) => async (deposit, payout, _, priceInUSD) => {
+  const now = new Date()
+  const title = `New Bond ${name} created!`
+  console.log(title)
+  return sendAttachment(SLACK_WEBHOOK, {
+    title,
+    fields: [
+      {
+        title: 'Deposit',
+        value: ethers.utils.formatEther(deposit),
+      },
+      {
+        title: 'Payout',
+        value: ethers.utils.formatUnits(payout, 9),
+      },
+      {
+        title: 'BondPrice',
+        value: priceFormatter.format(ethers.utils.formatEther(priceInUSD)),
+      },
+      {
+        title: 'Total',
+        value: priceFormatter.format(
+          ethers.utils.formatEther(payout.mul(priceInUSD).div(1e9)),
+        ),
+      },
+      {
+        title: 'Date',
+        value: now,
+      },
+    ],
+  })
+}
+
+bondContract_MAI44.on('BondCreated', notifyBondCreated(mai44BondName))
+bondContract_FRAX44.on('BondCreated', notifyBondCreated(frax44BondName))
+bondContract_MAI_CLAM44.on('BondCreated', notifyBondCreated(maiclam44BondName))
+bondContract_FRAX_CLAM44.on(
+  'BondCreated',
+  notifyBondCreated(fraxclam44BondName),
+)
 
 main().catch((error) => {
   console.error(error)

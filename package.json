@@ -10,6 +10,7 @@
   "author": "d0c0q@otterclam.finance",
   "license": "MIT",
   "dependencies": {
+    "axios": "^0.24.0",
     "discord.js": "^12.2.0",
     "dotenv": "^10.0.0",
     "ethers": "^5.5.1",
