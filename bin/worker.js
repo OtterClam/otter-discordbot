@@ -22,7 +22,7 @@ const {
 const { priceSidebar } = require('../src/price')
 const { bondSidebar } = require('../src/bond')
 const { rebaseSidebar } = require('../src/rebase')
-const { sendAttachment } = require('../src/slack')
+const { sendBondCreated } = require('../src/slack')
 
 const { RESERVE_MAI_CLAM } = require('../src/constant')
 const { sidebarBotFactory } = require('../src/sidebarBot')
@@ -92,35 +92,16 @@ const priceFormatter = Intl.NumberFormat('en', {
   currency: 'usd',
 })
 const notifyBondCreated = (name) => async (deposit, payout, _, priceInUSD) => {
-  const now = new Date()
   const title = `New Bond ${name} created!`
   console.log(title)
-  return sendAttachment(SLACK_WEBHOOK, {
+  return sendBondCreated(SLACK_WEBHOOK, {
     title,
-    fields: [
-      {
-        title: 'Deposit',
-        value: ethers.utils.formatEther(deposit),
-      },
-      {
-        title: 'Payout',
-        value: ethers.utils.formatUnits(payout, 9),
-      },
-      {
-        title: 'BondPrice',
-        value: priceFormatter.format(ethers.utils.formatEther(priceInUSD)),
-      },
-      {
-        title: 'Total',
-        value: priceFormatter.format(
-          ethers.utils.formatEther(payout.mul(priceInUSD).div(1e9)),
-        ),
-      },
-      {
-        title: 'Date',
-        value: now,
-      },
-    ],
+    deposit: ethers.utils.formatEther(deposit),
+    payout: ethers.utils.formatUnits(payout, 9),
+    price: priceFormatter.format(ethers.utils.formatEther(priceInUSD)),
+    total: priceFormatter.format(
+      ethers.utils.formatEther(payout.mul(priceInUSD).div(1e9)),
+    ),
   })
 }
 
