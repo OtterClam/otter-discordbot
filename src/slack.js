@@ -27,11 +27,11 @@ const sendBondCreated = async (url, { title, deposit, payout, price, total }) =>
             },
             {
               type: 'mrkdwn',
-              text: `*Price*\n$${price}`,
+              text: `*Price*\n${price}`,
             },
             {
               type: 'mrkdwn',
-              text: `*Total*\n$${total}`,
+              text: `*Total*\n${total}`,
             },
           ],
         },
