@@ -1,12 +1,12 @@
 const { Client } = require('discord.js')
 
-const sidebarFactory = (opts) => {
-  const { token, interval, setSidebar } = opts
+const sidebarBotFactory = (opts) => {
+  const { token, interval, sidebar } = opts
   const bot = new Client()
 
   const loop = () => {
     const loopAsync = async () => {
-      const { title, activity } = await setSidebar()
+      const { title, activity } = await sidebar()
       await Promise.all([
         bot.user.setActivity(activity),
         bot.guilds.cache.map((guild) => guild.me.setNickname(title)),
@@ -28,5 +28,5 @@ const sidebarFactory = (opts) => {
 }
 
 module.exports = {
-  sidebarFactory,
+  sidebarBotFactory,
 }

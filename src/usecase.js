@@ -55,9 +55,6 @@ const getPriceInfo = async () => {
   }
 }
 
-const getRawBondPrice = async ({ bondContract }) => {
-  return bondContract.bondPriceInUSD()
-}
 const getBondFiveDayRate = async () => {
   const sClamCirc = (await sCLAM.circulatingSupply()) / 1e9
   const epoch = await stakingContract.epoch()
@@ -69,7 +66,7 @@ const getBondFiveDayRate = async () => {
 const getBondInfo = async ({ pairContract, bondContract, assetAddress }) => {
   const [rawMarketPrice, rawBondPrice, fiveDayRate] = await Promise.all([
     getRawMarketPrice({ pairContract, assetAddress }),
-    getRawBondPrice({ bondContract }),
+    bondContract.bondPriceInUSD(),
     getBondFiveDayRate(),
   ])
   const price = Number(rawBondPrice / 1e18).toFixed(2)
