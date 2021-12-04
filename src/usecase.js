@@ -17,10 +17,8 @@ const getTotalSupply = async () => {
 }
 
 const getRawMarketPrice = async (
-  { pairContract, assetAddress } = {
-    pairContract: pairContract_MAI_CLAM,
-    assetAddress: RESERVE_MAI_CLAM,
-  },
+  pairContract = pairContract_MAI_CLAM,
+  assetAddress = RESERVE_MAI_CLAM,
 ) => {
   if (pairContract === undefined || assetAddress === undefined)
     throw Error(
@@ -63,9 +61,9 @@ const getBondFiveDayRate = async () => {
   const fiveDayDiscount = Math.pow(1 + stakingRebase, 5 * 3) - 1
   return fiveDayDiscount
 }
-const getBondInfo = async ({ pairContract, bondContract, assetAddress }) => {
+const getBondInfo = async (bondContract, pairContract, assetAddress) => {
   const [rawMarketPrice, rawBondPrice, fiveDayRate] = await Promise.all([
-    getRawMarketPrice({ pairContract, assetAddress }),
+    getRawMarketPrice(pairContract, assetAddress),
     bondContract.bondPriceInUSD(),
     getBondFiveDayRate(),
   ])
