@@ -16,6 +16,7 @@ const {
   bondContract_FRAX44,
   bondContract_MAI_CLAM44,
   bondContract_FRAX_CLAM44,
+  bondContract_MATIC44,
   pairContract_MAI_CLAM,
 } = require('../src/contract')
 
@@ -31,6 +32,7 @@ const mai44BondName = 'MAI (4,4)'
 const frax44BondName = 'FRAX (4,4)'
 const maiclam44BondName = 'MAI/CLAM (4,4)'
 const fraxclam44BondName = 'FRAX/CLAM (4,4)'
+const matic44BondName = 'MATIC (4,4)'
 
 const main = async () => {
   await Promise.all([
@@ -80,6 +82,16 @@ const main = async () => {
       ),
     })(),
     sidebarBotFactory({
+      token: DISCORD_BOND_MAI44_BOT_TOKEN,
+      interval: UPDATE_INTERVAL,
+      sidebar: bondSidebar(
+        matic44BondName,
+        bondContract_MATIC44,
+        pairContract_MAI_CLAM,
+        RESERVE_MAI_CLAM,
+      ),
+    })(),
+    sidebarBotFactory({
       token: DISCORD_REBASE_BOT_TOKEN,
       interval: UPDATE_INTERVAL,
       sidebar: rebaseSidebar,
@@ -112,6 +124,7 @@ bondContract_FRAX_CLAM44.on(
   'BondCreated',
   notifyBondCreated(fraxclam44BondName),
 )
+bondContract_MATIC44.on('BondCreated', notifyBondCreated(matic44BondName))
 
 main().catch((error) => {
   console.error(error)
