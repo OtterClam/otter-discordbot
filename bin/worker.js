@@ -6,6 +6,7 @@ const {
   DISCORD_BOND_MAI44_BOT_TOKEN,
   DISCORD_BOND_FRAX44_BOT_TOKEN,
   DISCORD_BOND_MAI_CLAM44_BOT_TOKEN,
+  DISCORD_BOND_MATIC44_BOT_TOKEN,
   DISCORD_BOND_FRAX_CLAM44_BOT_TOKEN,
   SLACK_WEBHOOK,
   UPDATE_INTERVAL,
@@ -82,7 +83,7 @@ const main = async () => {
       ),
     })(),
     sidebarBotFactory({
-      token: DISCORD_BOND_MAI44_BOT_TOKEN,
+      token: DISCORD_BOND_MATIC44_BOT_TOKEN,
       interval: UPDATE_INTERVAL,
       sidebar: bondSidebar(
         matic44BondName,
