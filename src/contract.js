@@ -20,7 +20,7 @@ const {
 } = require('./constant')
 
 const provider = new ethers.providers.JsonRpcProvider(
-  'https://rpc-mainnet.maticvigil.com/',
+  'https://polygon-rpc.com/',
 )
 
 const bondContract_MAI44 = bondContract(BOND_MAI44, provider)
