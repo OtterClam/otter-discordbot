@@ -33,7 +33,7 @@ const mai44BondName = 'MAI (4,4)'
 const frax44BondName = 'FRAX (4,4)'
 const maiclam44BondName = 'MAI/CLAM (4,4)'
 const fraxclam44BondName = 'FRAX/CLAM (4,4)'
-const matic44BondName = 'MATIC (4,4)'
+const matic44BondName = 'WMATIC (4,4)'
 
 const main = async () => {
   await Promise.all([
