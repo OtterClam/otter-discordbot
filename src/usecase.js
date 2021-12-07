@@ -10,7 +10,7 @@ const {
 const { CLAM_ADDRESS, RESERVE_MAI_CLAM } = require('./constant')
 const { commaNumber } = require('../src/utils')
 
-const getTotalSupply = async () => {
+const getCirculatingSupply = async () => {
   return Number(
     (await circulatingSupply_CLAM.CLAMCirculatingSupply()) / 1e9,
   ).toFixed(0)
@@ -39,7 +39,7 @@ const getPriceInfo = async () => {
       getRawMarketPrice(),
       stakingContract.contractBalance(),
       circulatingSupply_CLAM.CLAMCirculatingSupply(),
-      getTotalSupply(),
+      getCirculatingSupply(),
     ])
   return {
     price: Number((rawMarketPrice.toNumber() / 1e9).toFixed(4)),
@@ -89,7 +89,7 @@ const getRebaseInfo = async () => {
 
 module.exports = {
   getRebaseInfo,
-  getTotalSupply,
+  getCirculatingSupply,
   getBondInfo,
   getPriceInfo,
 }

@@ -1,5 +1,5 @@
 require('dotenv').config()
-const { getTotalSupply } = require('../src/usecase')
+const { getCirculatingSupply } = require('../src/usecase')
 
 const express = require('express')
 const app = express()
@@ -14,7 +14,10 @@ app.get(
   '/otterclamerc20v2/:key',
   asyncWrapper(async (req, res) => {
     const key = req.params.key
-    const allowedValues = { total_supply: getTotalSupply }
+    const allowedValues = {
+      circulating_supply: getCirculatingSupply,
+      total_supply: getCirculatingSupply,
+    }
     if (!Object.keys(allowedValues).includes(key)) {
       return res.status(400).send()
     }
