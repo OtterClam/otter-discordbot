@@ -1,6 +1,9 @@
 const axios = require('axios')
 
-const sendBondCreated = async (url, { title, deposit, payout, price, total }) =>
+const sendBondCreated = async (
+  url,
+  { title, title_link, deposit, payout, price, total },
+) =>
   axios({
     url,
     method: 'post',
@@ -10,6 +13,7 @@ const sendBondCreated = async (url, { title, deposit, payout, price, total }) =>
         {
           color: '#cecda9',
           title,
+          title_link,
           fields: [
             {
               title: 'Deposit',

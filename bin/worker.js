@@ -104,19 +104,21 @@ const priceFormatter = Intl.NumberFormat('en', {
   style: 'currency',
   currency: 'usd',
 })
-const notifyBondCreated = (name) => async (deposit, payout, _, priceInUSD) => {
-  const title = `New Bond ${name} created!`
-  console.log(title)
-  return sendBondCreated(SLACK_WEBHOOK, {
-    title,
-    deposit: ethers.utils.formatEther(deposit),
-    payout: ethers.utils.formatUnits(payout, 9),
-    price: priceFormatter.format(ethers.utils.formatEther(priceInUSD)),
-    total: priceFormatter.format(
-      ethers.utils.formatEther(payout.mul(priceInUSD).div(1e9)),
-    ),
-  })
-}
+const notifyBondCreated =
+  (name) => async (deposit, payout, _, priceInUSD, event) => {
+    const title = `New Bond ${name} created!`
+    console.log(title)
+    return sendBondCreated(SLACK_WEBHOOK, {
+      title,
+      title_link: `https://polygonscan.com/tx/${event.transactionHash}`,
+      deposit: ethers.utils.formatEther(deposit),
+      payout: ethers.utils.formatUnits(payout, 9),
+      price: priceFormatter.format(ethers.utils.formatEther(priceInUSD)),
+      total: priceFormatter.format(
+        ethers.utils.formatEther(payout.mul(priceInUSD).div(1e9)),
+      ),
+    })
+  }
 
 bondContract_MAI44.on('BondCreated', notifyBondCreated(mai44BondName))
 bondContract_FRAX44.on('BondCreated', notifyBondCreated(frax44BondName))
