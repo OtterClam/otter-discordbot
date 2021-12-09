@@ -105,12 +105,14 @@ const priceFormatter = Intl.NumberFormat('en', {
   currency: 'usd',
 })
 const notifyBondCreated =
-  (name) => async (deposit, payout, _, priceInUSD, event) => {
+  (name) =>
+  async (deposit, payout, _, priceInUSD, ...rest) => {
+    const txHash = rest[rest.length - 1].transactionHash
     const title = `New Bond ${name} created!`
     console.log(title)
     return sendBondCreated(SLACK_WEBHOOK, {
       title,
-      title_link: `https://polygonscan.com/tx/${event.transactionHash}`,
+      title_link: `https://polygonscan.com/tx/${txHash}`,
       deposit: ethers.utils.formatEther(deposit),
       payout: ethers.utils.formatUnits(payout, 9),
       price: priceFormatter.format(ethers.utils.formatEther(priceInUSD)),
