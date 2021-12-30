@@ -37,7 +37,7 @@ const pearlPriceSidebar = async () => {
   const { price, currentIndex } = await getPearlPriceInfo()
   pastPearlPriceBuf = price
 
-  const arrow = priceArrow(price, pastPearlArrow, pastArrow)
+  const arrow = priceArrow(price, pastPrice, pastPearlArrow)
   pastPearlArrow = arrow
 
   const activity = `index: ${currentIndex}`
