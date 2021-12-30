@@ -1,5 +1,5 @@
 const { priceArrow } = require('./utils')
-const { getPriceInfo } = require('./usecase')
+const { getPriceInfo, getPearlPriceInfo } = require('./usecase')
 
 let pastPriceBuf = 0
 let pastArrow = ''
@@ -7,7 +7,7 @@ let count = 0
 
 const priceSidebar = async () => {
   const pastPrice = pastPriceBuf
-  const { price, tvl, marketCap, totalSupply } = await getPriceInfo({})
+  const { price, tvl, marketCap, totalSupply } = await getPriceInfo()
   pastPriceBuf = price
 
   const arrow = priceArrow(price, pastPrice, pastArrow)
@@ -21,7 +21,7 @@ const priceSidebar = async () => {
   } else {
     activity = `CircSupply: ${totalSupply}`
   }
-  console.log(`pricebot: ${pastPrice} ${arrow} ${price}, ${activity}`)
+  console.log(`price: ${pastPrice} ${arrow} ${price}, ${activity}`)
   count++
 
   return {
@@ -30,6 +30,23 @@ const priceSidebar = async () => {
   }
 }
 
+let pastPearlPriceBuf = 0
+let pastPearlArrow = ''
+const pearlPriceSidebar = async () => {
+  const pastPrice = pastPearlPriceBuf
+  const { price, currentIndex } = await getPearlPriceInfo()
+  pastPearlPriceBuf = price
+
+  const arrow = priceArrow(price, pastPearlArrow, pastArrow)
+  pastPearlArrow = arrow
+
+  const activity = `index: ${currentIndex}`
+
+  console.log(`pearl price: ${pastPrice} ${arrow} ${price}, ${activity}`)
+  return { title: `$${price} ${arrow}`, activity }
+}
+
 module.exports = {
   priceSidebar,
+  pearlPriceSidebar,
 }

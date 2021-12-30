@@ -9,6 +9,7 @@ const {
 
 const { CLAM_ADDRESS, RESERVE_MAI_CLAM } = require('./constant')
 const { commaNumber } = require('../src/utils')
+const { formatUnits } = require('ethers/lib/utils')
 
 const getCirculatingSupply = async () => {
   return Number(
@@ -53,6 +54,18 @@ const getPriceInfo = async () => {
   }
 }
 
+const getPearlPriceInfo = async () => {
+  const [rawMarketPrice, currentIndex] = await Promise.all([
+    getRawMarketPrice(),
+    stakingContract.index(),
+  ])
+
+  return {
+    price: Number((rawMarketPrice / 1e9) * (currentIndex / 1e9)).toFixed(4),
+    currentIndex: Number(currentIndex / 1e9).toFixed(4),
+  }
+}
+
 const getBondFiveDayRate = async () => {
   const sClamCirc = (await sCLAM.circulatingSupply()) / 1e9
   const epoch = await stakingContract.epoch()
@@ -92,4 +105,5 @@ module.exports = {
   getCirculatingSupply,
   getBondInfo,
   getPriceInfo,
+  getPearlPriceInfo,
 }

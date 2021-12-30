@@ -3,6 +3,7 @@ require('dotenv').config()
 const {
   DISCORD_REBASE_BOT_TOKEN,
   DISCORD_PRICE_BOT_TOKEN,
+  DISCORD_PRICE_PEARL_BOT_TOKEN,
   DISCORD_BOND_MAI44_BOT_TOKEN,
   DISCORD_BOND_FRAX44_BOT_TOKEN,
   DISCORD_BOND_MAI_CLAM44_BOT_TOKEN,
@@ -23,7 +24,7 @@ const {
   pairContract_MAI_CLAM,
 } = require('../src/contract')
 
-const { priceSidebar } = require('../src/price')
+const { priceSidebar, pearlPriceSidebar } = require('../src/price')
 const { bondSidebar } = require('../src/bond')
 const { rebaseSidebar } = require('../src/rebase')
 const { sendBondCreated } = require('../src/slack')
@@ -44,6 +45,11 @@ const main = async () => {
       token: DISCORD_PRICE_BOT_TOKEN,
       interval: UPDATE_INTERVAL,
       sidebar: priceSidebar,
+    })(),
+    sidebarBotFactory({
+      token: DISCORD_PRICE_PEARL_BOT_TOKEN,
+      interval: UPDATE_INTERVAL,
+      sidebar: pearlPriceSidebar,
     })(),
     sidebarBotFactory({
       token: DISCORD_BOND_FRAX44_BOT_TOKEN,
