@@ -34,6 +34,7 @@ app.get(
   asyncWrapper(async (req, res) => {
     const key = req.params.key
     const allowedValues = {
+      circulating_supply: getPearlTotalSupply,
       total_supply: getPearlTotalSupply,
     }
     if (!Object.keys(allowedValues).includes(key)) {
