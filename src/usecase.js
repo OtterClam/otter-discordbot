@@ -4,17 +4,22 @@ const {
   pairContract_MAI_CLAM,
   stakingContract,
   sCLAM,
+  PEARL,
   circulatingSupply_CLAM,
 } = require('./contract')
 
 const { CLAM_ADDRESS, RESERVE_MAI_CLAM } = require('./constant')
 const { commaNumber } = require('../src/utils')
-const { formatUnits } = require('ethers/lib/utils')
+const { formatEther } = require('ethers/lib/utils')
 
 const getCirculatingSupply = async () => {
   return Number(
     (await circulatingSupply_CLAM.CLAMCirculatingSupply()) / 1e9,
   ).toFixed(0)
+}
+
+const getPearlTotalSupply = async () => {
+  return Number(formatEther(await PEARL.totalSupply())).toFixed(0)
 }
 
 const getRawMarketPrice = async (
@@ -103,6 +108,7 @@ const getRebaseInfo = async () => {
 module.exports = {
   getRebaseInfo,
   getCirculatingSupply,
+  getPearlTotalSupply,
   getBondInfo,
   getPriceInfo,
   getPearlPriceInfo,

@@ -2,6 +2,7 @@ const { ethers } = require('ethers')
 const {
   bondContract,
   sCLAMContract,
+  PearlContract,
   sCLAMStakingContract,
   circulatingSupplyContract,
   uniswapPairContract,
@@ -19,6 +20,7 @@ const {
   BOND_WMATIC_CLAM44,
   STAKING_ADDRESS,
   sCLAM_ADDRESS,
+  PEARL_ADDRESS,
   CLAM_CIRCULATING_SUPPLY,
 } = require('./constant')
 
@@ -42,6 +44,7 @@ const pairContract_FRAX_CLAM = uniswapPairContract(RESERVE_FRAX_CLAM, provider)
 
 const stakingContract = sCLAMStakingContract(STAKING_ADDRESS, provider)
 const sCLAM = sCLAMContract(sCLAM_ADDRESS, provider)
+const PEARL = PearlContract(PEARL_ADDRESS, provider)
 const circulatingSupply_CLAM = circulatingSupplyContract(
   CLAM_CIRCULATING_SUPPLY,
   provider,
@@ -59,5 +62,6 @@ module.exports = {
   pairContract_FRAX_CLAM,
   stakingContract,
   sCLAM,
+  PEARL,
   circulatingSupply_CLAM,
 }

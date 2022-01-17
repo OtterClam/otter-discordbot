@@ -8,6 +8,7 @@ const OtterMaticLPBondDepository =
 const StakingContract = require('./StakingContract.json').abi
 const StakedClamTokenContract = require('./StakedClamTokenContract.json').abi
 const ClamCirculatingSupply = require('./ClamCirculatingSupply.json').abi
+const OtterPearl = require('./OtterPearlERC20.json').abi
 
 const uniswapPairContract = (address, provider) =>
   new ethers.Contract(address, UniswapV2Pair, provider)
@@ -22,6 +23,8 @@ const sCLAMStakingContract = (address, provider) =>
   new ethers.Contract(address, StakingContract, provider)
 const sCLAMContract = (address, provider) =>
   new ethers.Contract(address, StakedClamTokenContract, provider)
+const PearlContract = (address, provider) =>
+  new ethers.Contract(address, OtterPearl, provider)
 const circulatingSupplyContract = (address, provider) =>
   new ethers.Contract(address, ClamCirculatingSupply, provider)
 
@@ -31,5 +34,6 @@ module.exports = {
   bondNonStableCoinContract,
   sCLAMStakingContract,
   sCLAMContract,
+  PearlContract,
   circulatingSupplyContract,
 }

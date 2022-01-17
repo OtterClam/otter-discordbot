@@ -1,5 +1,5 @@
 require('dotenv').config()
-const { getCirculatingSupply } = require('../src/usecase')
+const { getCirculatingSupply, getPearlTotalSupply } = require('../src/usecase')
 
 const express = require('express')
 const app = express()
@@ -17,6 +17,24 @@ app.get(
     const allowedValues = {
       circulating_supply: getCirculatingSupply,
       total_supply: getCirculatingSupply,
+    }
+    if (!Object.keys(allowedValues).includes(key)) {
+      return res.status(400).send()
+    }
+
+    const f = allowedValues[key]
+    const ret = await f()
+    res.set('content-type', 'text/plain')
+    return res.send(`${ret}`)
+  }),
+)
+
+app.get(
+  '/otterpearl/erc20/:key',
+  asyncWrapper(async (req, res) => {
+    const key = req.params.key
+    const allowedValues = {
+      total_supply: getPearlTotalSupply,
     }
     if (!Object.keys(allowedValues).includes(key)) {
       return res.status(400).send()
