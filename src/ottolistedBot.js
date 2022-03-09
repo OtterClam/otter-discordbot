@@ -1,20 +1,9 @@
 const { SlashCommandBuilder } = require('@discordjs/builders')
-const { REST } = require('@discordjs/rest')
-const { Routes } = require('discord-api-types/v9')
-const { newClient } = require('./client')
+const { newClient, registerSlashCommand } = require('./discord')
 
-const register = ({ commands, token, clientId, guildId }) => {
-  new REST({ version: '9' })
-    .setToken(token)
-    .put(Routes.applicationGuildCommands(clientId, guildId), {
-      body: commands,
-    })
-    .then(() => console.log('Successfully registered application commands.'))
-    .catch(console.error)
-}
 const wait = require('node:timers/promises').setTimeout
 
-const ottolistedBotFactory = ({ token, clientId, guildId }) => {
+const ottolistedBot = async ({ token, clientId, guildId }) => {
   const client = newClient()
 
   const commands = [
@@ -27,9 +16,9 @@ const ottolistedBotFactory = ({ token, clientId, guildId }) => {
           .setRequired(true)
           .setDescription('wallet address'),
       ),
-  ].map(command => command.toJSON())
+  ]
 
-  register({ commands, token, clientId, guildId })
+  registerSlashCommand({ commands, token, clientId, guildId })
 
   client.once('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`)
@@ -58,9 +47,9 @@ const ottolistedBotFactory = ({ token, clientId, guildId }) => {
     await reply('Pong!')
   })
 
-  return () => client.login(token)
+  return client.login(token)
 }
 
 module.exports = {
-  ottolistedBotFactory,
+  ottolistedBot,
 }

@@ -1,36 +1,35 @@
-const { Client, Intents } = require('discord.js')
+const { newClient } = require('./discord')
 
-const sidebarBotFactory = opts => {
-  const { token, interval, sidebar } = opts
-  const bot = new Client({ intents: [Intents.FLAGS.GUILDS] })
+const sidebarBot = ({ token, interval, sidebar }) => {
+  const client = newClient()
 
   const loop = () => {
     const loopAsync = async () => {
       const { title, activity, image } = await sidebar()
       const actions = [
-        bot.user.setActivity(activity),
-        bot.guilds.cache.map(guild => guild.me.setNickname(title)),
+        client.user.setActivity(activity),
+        client.guilds.cache.map(guild => guild.me.setNickname(title)),
       ]
       if (image) {
-        actions.push(bot.user.setAvatar(image))
+        actions.push(client.user.setAvatar(image))
       }
       await Promise.all(actions)
     }
     loopAsync().catch(console.error)
   }
 
-  bot.on('guildCreate', guild => {
+  client.on('guildCreate', guild => {
     console.log(`New server has added the bot! Name: ${guild.name}`)
   })
-  bot.on('ready', () => {
-    console.log(`Logged in as ${bot.user.tag}!`)
+  client.on('ready', () => {
+    console.log(`Logged in as ${client.user.tag}!`)
     loop()
     setInterval(loop, interval)
   })
 
-  return () => bot.login(token)
+  return client.login(token)
 }
 
 module.exports = {
-  sidebarBotFactory,
+  sidebarBot,
 }

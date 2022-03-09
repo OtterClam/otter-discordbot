@@ -14,36 +14,36 @@ const { priceSidebar, pearlPriceSidebar } = require('../src/price')
 const { bondSidebar } = require('../src/bond')
 const { rebaseSidebar } = require('../src/rebase')
 
-const { sidebarBotFactory } = require('../src/sidebarBot')
-const { ottolistedBotFactory } = require('../src/ottolistedBot')
+const { sidebarBot } = require('../src/sidebarBot')
+const { ottolistedBot } = require('../src/ottolistedBot')
 
 const main = async () => {
   await Promise.all([
-    sidebarBotFactory({
+    sidebarBot({
       token: DISCORD_PRICE_BOT_TOKEN,
       interval: UPDATE_INTERVAL,
       sidebar: priceSidebar,
-    })(),
-    sidebarBotFactory({
+    }),
+    sidebarBot({
       token: DISCORD_PRICE_PEARL_BOT_TOKEN,
       interval: UPDATE_INTERVAL,
       sidebar: pearlPriceSidebar,
-    })(),
-    sidebarBotFactory({
+    }),
+    sidebarBot({
       token: DISCORD_BOND_BOT_TOKEN,
       interval: UPDATE_INTERVAL,
       sidebar: bondSidebar(),
-    })(),
-    sidebarBotFactory({
+    }),
+    sidebarBot({
       token: DISCORD_REBASE_BOT_TOKEN,
       interval: UPDATE_INTERVAL,
       sidebar: rebaseSidebar,
-    })(),
-    ottolistedBotFactory({
+    }),
+    ottolistedBot({
       clientId: DISCORD_OTTERLISTED_BOT_CLIENT_ID,
       token: DISCORD_OTTERLISTED_BOT_TOKEN,
       guildId: DISCORD_OTTERLISTED_BOT_GUILD_ID,
-    })(),
+    }),
   ])
 }
 
