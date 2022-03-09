@@ -1,8 +1,8 @@
-const { Client } = require('discord.js')
+const { Client, Intents } = require('discord.js')
 
 const sidebarBotFactory = opts => {
   const { token, interval, sidebar } = opts
-  const bot = new Client()
+  const bot = new Client({ intents: [Intents.FLAGS.GUILDS] })
 
   const loop = () => {
     const loopAsync = async () => {
