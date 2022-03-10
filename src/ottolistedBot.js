@@ -64,7 +64,7 @@ const ottolistedBot = async ({
       }
       await addressesSheet.addRow({
         ID: interaction.user.id,
-        Name: interaction.user.username,
+        Name: interaction.user.tag,
         Wallet: wallet,
       })
 
