@@ -67,19 +67,25 @@ const bondSidebar = () => async () => {
     ),
   )
 
+  let changed = false
+  const ts = Date.now()
   infos.forEach((info, i) => {
     if (info.status == 'fulfilled') {
       const { price, roi } = info.value
       if (currPrice == 0 || Number(price) < currPrice) {
+        console.log(
+          `BONDBOT CHANGED(${ts})! ${bonds[currIndex].name} -> ${bonds[i].name}`,
+        )
         currPrice = Number(price)
         currROI = roi
         currIndex = i
+        changed = true
       }
     }
   })
   const title = bonds[currIndex].name
   const activity = `$${currPrice} ROI: ${currROI}%`
-  const image = bonds[currIndex].image
+  const image = changed ? bonds[currIndex].image : null
   console.log(`${title} ${activity} ${image}`)
   return {
     title,
