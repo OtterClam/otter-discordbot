@@ -20,12 +20,20 @@ const ottolistedBot = async ({
   const commands = [
     new SlashCommandBuilder()
       .setName('ottolisted')
-      .setDescription('collect ottolisted information')
-      .addStringOption(option =>
-        option
-          .setName('wallet')
-          .setRequired(true)
-          .setDescription('wallet address'),
+      .setDescription('ottolisted command')
+      .addSubcommand(subcommand =>
+        subcommand
+          .setName('submit')
+          .setDescription('submit wallet address')
+          .addStringOption(option =>
+            option
+              .setName('wallet')
+              .setRequired(true)
+              .setDescription('wallet address'),
+          ),
+      )
+      .addSubcommand(subcommand =>
+        subcommand.setName('info').setDescription('ottolisted info'),
       ),
   ]
 
@@ -40,36 +48,21 @@ const ottolistedBot = async ({
     if (interaction.commandName !== 'ottolisted') return
 
     const reply = m => interaction.editReply({ content: m, ephemeral: true })
+
     try {
       await interaction.deferReply({ ephemeral: true })
-
-      const wallet = interaction.options.getString('wallet')
-      if (!wallet.match(/^0x[0-9a-fA-F]{40}$/)) {
-        await reply('Invalid wallet address.')
-        return
-      }
-      const rolesSheet = sheet.sheetsByTitle['Roles']
-
-      const roles = (await rolesSheet.getRows())?.map(r => r && r.Name) ?? []
-      if (!interaction.member.roles.cache.some(r => roles.includes(r.name))) {
+      if (!(await ottolisted({ sheet, interaction }))) {
         await reply('You are not ottolisted!')
         return
       }
 
-      const addressesSheet = sheet.sheetsByTitle['Addresses']
-      const ids = (await addressesSheet.getRows())?.map(r => r && r.ID) ?? []
-      if (ids.some(id => id === interaction.user.id)) {
-        await reply(`Already submitted.`)
-        return
+      if (interaction.options.getSubcommand() === 'submit') {
+        await submit({ sheet, interaction, reply })
+      } else if (interaction.options.getSubcommand() === 'info') {
+        await info({ sheet, interaction, reply })
+      } else {
+        await reply('Invalid command.')
       }
-      await addressesSheet.addRow({
-        ID: interaction.user.id,
-        Name: interaction.user.tag,
-        Wallet: wallet,
-      })
-
-      // update google google sheet
-      await reply('Submitted!')
     } catch (err) {
       console.error(err)
       reply(`Unexpected error`).catch(console.error)
@@ -77,6 +70,47 @@ const ottolistedBot = async ({
   })
 
   return client.login(token)
+}
+
+const ottolisted = async ({ sheet, interaction }) => {
+  const rolesSheet = sheet.sheetsByTitle['Roles']
+  const roles = (await rolesSheet.getRows())?.map(r => r && r.Name) ?? []
+  return interaction.member.roles.cache.some(r => roles.includes(r.name))
+}
+
+const info = async ({ sheet, interaction, reply }) => {
+  const addressesSheet = sheet.sheetsByTitle['Addresses']
+  const wallet =
+    (await addressesSheet.getRows())
+      ?.filter(r => r && r.ID === interaction.user.id)
+      ?.map(r => r.Wallet) ?? []
+  if (wallet.length !== 0) {
+    await reply(`Your wallet address is ${wallet[0]}`)
+  } else {
+    await reply('Not submitted yet.')
+  }
+}
+
+const submit = async ({ sheet, interaction, reply }) => {
+  const wallet = interaction.options.getString('wallet')
+  if (!wallet.match(/^0x[0-9a-fA-F]{40}$/)) {
+    await reply('Invalid wallet address.')
+    return
+  }
+  const addressesSheet = sheet.sheetsByTitle['Addresses']
+  const ids = (await addressesSheet.getRows())?.map(r => r && r.ID) ?? []
+  if (ids.some(id => id === interaction.user.id)) {
+    await reply(`Already submitted.`)
+    return
+  }
+  await addressesSheet.addRow({
+    ID: interaction.user.id,
+    Name: interaction.user.tag,
+    Wallet: wallet,
+  })
+
+  // update google google sheet
+  await reply('Submitted!')
 }
 
 module.exports = {
