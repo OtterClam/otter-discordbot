@@ -130,19 +130,21 @@ const submit = async ({ sheet, interaction, reply }) => {
     return
   }
   const addressesSheet = sheet.sheetsByTitle['Addresses']
-  const ids = (await addressesSheet.getRows())?.map(r => r && r.ID) ?? []
-  if (ids.some(id => id === interaction.user.id)) {
-    await reply(`Already submitted.`)
+  const rows = (await addressesSheet.getRows()) ?? []
+  const existsRow = rows.filter(r => r && r.ID === interaction.user.id)
+  if (existsRow.length > 0) {
+    existsRow[0].Wallet = wallet
+    await existsRow[0].save()
+    await reply(`${wallet} resubmitted.`)
     return
+  } else {
+    await addressesSheet.addRow({
+      ID: interaction.user.id,
+      Name: interaction.user.tag,
+      Wallet: wallet,
+    })
+    await reply('${walle} submitted!')
   }
-  await addressesSheet.addRow({
-    ID: interaction.user.id,
-    Name: interaction.user.tag,
-    Wallet: wallet,
-  })
-
-  // update google google sheet
-  await reply('Submitted!')
 }
 
 module.exports = {
