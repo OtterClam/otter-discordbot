@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders')
-const { newClient, registerSlashCommand } = require('./discord')
+const { newClient, registerSlashCommand, Intents } = require('./discord')
 const { newSheetsClient } = require('./google')
 
 const ottolistedBot = async ({
@@ -10,7 +10,7 @@ const ottolistedBot = async ({
   sheetPriKey,
   sheetId,
 }) => {
-  const client = newClient()
+  const client = newClient([Intents.FLAGS.GUILD_MEMBERS])
   const sheet = await newSheetsClient({
     email: sheetEmail,
     priKey: sheetPriKey,
@@ -43,6 +43,38 @@ const ottolistedBot = async ({
     console.log(`Logged in as ${client.user.tag}!`)
   })
 
+  client.on('guildMemberUpdate', async (oldMember, newMember) => {
+    try {
+      const [before, after] = await Promise.all([
+        ottolisted({ sheet, member: oldMember }),
+        ottolisted({ sheet, member: newMember }),
+      ])
+
+      const addressesSheet = sheet.sheetsByTitle['Addresses']
+      if (before && !after) {
+        const rows = (await addressesSheet.getRows()) ?? []
+        rows
+          .filter(r => r && r.ID === oldMember.id)
+          .forEach(r => {
+            r.Disqualified = '*'
+            r.save().catch(console.error)
+            console.log(`${oldMember.user.tag} unqualified`)
+          })
+      } else if (!before && after) {
+        const rows = (await addressesSheet.getRows()) ?? []
+        rows
+          .filter(r => r && r.ID === oldMember.id)
+          .forEach(r => {
+            r.Disqualified = ''
+            r.save().catch(console.error)
+            console.log(`${newMember.user.tag} qualified back`)
+          })
+      }
+    } catch (err) {
+      console.error(err)
+    }
+  })
+
   client.on('interactionCreate', async interaction => {
     if (!interaction.isCommand()) return
     if (interaction.commandName !== 'ottolisted') return
@@ -51,7 +83,7 @@ const ottolistedBot = async ({
 
     try {
       await interaction.deferReply({ ephemeral: true })
-      if (!(await ottolisted({ sheet, interaction }))) {
+      if (!(await ottolisted({ sheet, member: interaction.member }))) {
         await reply('You are not ottolisted!')
         return
       }
@@ -72,10 +104,10 @@ const ottolistedBot = async ({
   return client.login(token)
 }
 
-const ottolisted = async ({ sheet, interaction }) => {
+const ottolisted = async ({ sheet, member }) => {
   const rolesSheet = sheet.sheetsByTitle['Roles']
   const roles = (await rolesSheet.getRows())?.map(r => r && r.Name) ?? []
-  return interaction.member.roles.cache.some(r => roles.includes(r.name))
+  return member.roles.cache.some(r => roles.includes(r.name))
 }
 
 const info = async ({ sheet, interaction, reply }) => {

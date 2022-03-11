@@ -2,7 +2,8 @@ const { Client, Intents } = require('discord.js')
 const { REST } = require('@discordjs/rest')
 const { Routes } = require('discord-api-types/v9')
 
-const newClient = () => new Client({ intents: [Intents.FLAGS.GUILDS] })
+const newClient = (additionalIntents = []) =>
+  new Client({ intents: [Intents.FLAGS.GUILDS, ...additionalIntents] })
 
 const registerSlashCommand = ({ commands, token, clientId, guildId }) => {
   new REST({ version: '9' })
@@ -18,4 +19,5 @@ const registerSlashCommand = ({ commands, token, clientId, guildId }) => {
 module.exports = {
   newClient,
   registerSlashCommand,
+  Intents,
 }
