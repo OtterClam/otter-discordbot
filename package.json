@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "Discord bot for pulling cryptocurrency data at intervals and displaying it in the users sidebar.",
   "scripts": {
-    "worker": "node bin/worker.js",
-    "web": "node bin/web.js",
+    "worker": "pm2-runtime start bin/worker.js",
+    "web": "pm2-runtime start bin/web.js",
     "test": "jest"
   },
   "author": "d0c0q@otterclam.finance",
@@ -18,7 +18,8 @@
     "dotenv": "^10.0.0",
     "ethers": "^5.5.1",
     "express": "^4.17.1",
-    "google-spreadsheet": "^3.2.0"
+    "google-spreadsheet": "^3.2.0",
+    "pm2": "^5.2.0"
   },
   "devDependencies": {
     "@types/jest": "^27.0.3",
