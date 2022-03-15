@@ -143,7 +143,7 @@ const submit = async ({ sheet, interaction, reply }) => {
       Name: interaction.user.tag,
       Wallet: wallet,
     })
-    await reply('${wallet} submitted!')
+    await reply(`${wallet} submitted!`)
   }
 }
 
