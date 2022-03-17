@@ -2,20 +2,12 @@ const { SlashCommandBuilder } = require('@discordjs/builders')
 const { newClient, registerSlashCommand, Intents } = require('./discord')
 const { newSheetsClient } = require('./google')
 
-const ottolistedBot = async ({
-  token,
-  clientId,
-  guildId,
-  sheetEmail,
-  sheetPriKey,
-  sheetId,
-}) => {
+const ADDRESS_SHEET_NAME = 'Addresses'
+const ROLES_SHEET_NAME = 'Roles'
+
+const ottolistedBot = async ({ token, clientId, guildId }) => {
   const client = newClient([Intents.FLAGS.GUILD_MEMBERS])
-  const sheet = await newSheetsClient({
-    email: sheetEmail,
-    priKey: sheetPriKey,
-    sheetId: sheetId,
-  })
+  const sheet = await newSheetsClient()
 
   const commands = [
     new SlashCommandBuilder()
@@ -50,7 +42,7 @@ const ottolistedBot = async ({
         ottolisted({ sheet, member: newMember }),
       ])
 
-      const addressesSheet = sheet.sheetsByTitle['Addresses']
+      const addressesSheet = sheet.sheetsByTitle[ADDRESS_SHEET_NAME]
       if (before && !after) {
         const rows = (await addressesSheet.getRows()) ?? []
         rows
@@ -105,13 +97,21 @@ const ottolistedBot = async ({
 }
 
 const ottolisted = async ({ sheet, member }) => {
-  const rolesSheet = sheet.sheetsByTitle['Roles']
+  const rolesSheet = sheet.sheetsByTitle[ROLES_SHEET_NAME]
   const roles = (await rolesSheet.getRows())?.map(r => r && r.Name) ?? []
   return member.roles.cache.some(r => roles.includes(r.name))
 }
 
+const walletOttolisted = async ({ wallet }) => {
+  const sheet = await newSheetsClient()
+  const addressesSheet = sheet.sheetsByTitle[ADDRESS_SHEET_NAME]
+  const wallets =
+    (await addressesSheet.getRows())?.filter(r => r)?.map(r => r.Wallet) ?? []
+  return wallets.includes(wallet)
+}
+
 const info = async ({ sheet, interaction, reply }) => {
-  const addressesSheet = sheet.sheetsByTitle['Addresses']
+  const addressesSheet = sheet.sheetsByTitle[ADDRESS_SHEET_NAME]
   const wallet =
     (await addressesSheet.getRows())
       ?.filter(r => r && r.ID === interaction.user.id)
@@ -129,7 +129,7 @@ const submit = async ({ sheet, interaction, reply }) => {
     await reply('Invalid wallet address.')
     return
   }
-  const addressesSheet = sheet.sheetsByTitle['Addresses']
+  const addressesSheet = sheet.sheetsByTitle[ADDRESS_SHEET_NAME]
   const rows = (await addressesSheet.getRows()) ?? []
   const existsRow = rows.filter(r => r && r.ID === interaction.user.id)
   if (existsRow.length > 0) {
@@ -149,4 +149,5 @@ const submit = async ({ sheet, interaction, reply }) => {
 
 module.exports = {
   ottolistedBot,
+  walletOttolisted,
 }

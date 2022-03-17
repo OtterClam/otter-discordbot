@@ -1,6 +1,16 @@
 const { GoogleSpreadsheet } = require('google-spreadsheet')
 
-const newSheetsClient = async ({ sheetId, email, priKey }) => {
+const {
+  GOOGLE_OTTOLISTED_SHEET_ID,
+  GOOGLE_OTTOLISTED_PRIVATE_KEY,
+  GOOGLE_OTTOLISTED_CLIENT_EMAIL,
+} = process.env
+
+const newSheetsClient = async ({
+  sheetId = GOOGLE_OTTOLISTED_SHEET_ID,
+  email = GOOGLE_OTTOLISTED_CLIENT_EMAIL,
+  priKey = GOOGLE_OTTOLISTED_PRIVATE_KEY,
+} = {}) => {
   const doc = new GoogleSpreadsheet(sheetId)
 
   // Initialize Auth - see https://theoephraim.github.io/node-google-spreadsheet/#/getting-started/authentication
