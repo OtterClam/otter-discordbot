@@ -3,6 +3,7 @@ const { getCirculatingSupply, getPearlTotalSupply } = require('../src/usecase')
 const { walletOttolisted } = require('../src/ottolistedBot')
 
 const express = require('express')
+const cors = require('cors')
 const app = express()
 const port = process.env['PORT']
 
@@ -48,6 +49,7 @@ app.get(
 
 app.get(
   '/ottolisted/:wallet',
+  cors(),
   asyncWrapper(async (req, res) => {
     const wallet = req.params.wallet
     if (!(await walletOttolisted({ wallet }))) {
