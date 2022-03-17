@@ -106,8 +106,11 @@ const walletOttolisted = async ({ wallet }) => {
   const sheet = await newSheetsClient()
   const addressesSheet = sheet.sheetsByTitle[ADDRESS_SHEET_NAME]
   const wallets =
-    (await addressesSheet.getRows())?.filter(r => r)?.map(r => r.Wallet) ?? []
-  return wallets.includes(wallet)
+    (await addressesSheet.getRows())
+      ?.filter(r => r)
+      ?.map(r => r.Wallet)
+      ?.filter(w => w) ?? []
+  return wallets.map(w => w.toLowerCase()).includes(wallet.toLowerCase())
 }
 
 const info = async ({ sheet, interaction, reply }) => {
