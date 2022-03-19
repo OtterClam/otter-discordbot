@@ -81,8 +81,7 @@ const ottolistedBot = async ({ token, clientId, guildId }) => {
       }
 
       if (interaction.options.getSubcommand() === 'submit') {
-        await reply('Already closed')
-        // await submit({ sheet, interaction, reply })
+        await submit({ sheet, interaction, reply })
       } else if (interaction.options.getSubcommand() === 'info') {
         await info({ sheet, interaction, reply })
       } else {
