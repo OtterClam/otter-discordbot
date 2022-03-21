@@ -16,10 +16,6 @@ const {
 
 const { SLACK_WEBHOOK } = process.env
 
-let currPrice = 0
-let currROI = 0
-let currIndex = 0
-
 const mai44BondName = 'MAI (4,4)'
 const frax44BondName = 'FRAX (4,4)'
 const maiclam44BondName = 'MAI/CLAM (4,4)'
@@ -60,6 +56,9 @@ const bonds = [
   },
 ]
 
+let currPrice = 0
+let choosed = 0
+
 const bondSidebar = () => async () => {
   const infos = await Promise.allSettled(
     bonds.map(async bond =>
@@ -71,21 +70,20 @@ const bondSidebar = () => async () => {
   const ts = Date.now()
   infos.forEach((info, i) => {
     if (info.status == 'fulfilled') {
-      const { price, roi } = info.value
+      const { price } = info.value
       if (currPrice == 0 || Number(price) < currPrice) {
         console.log(
-          `BONDBOT CHANGED(${ts})! ${bonds[currIndex].name} -> ${bonds[i].name}`,
+          `BONDBOT CHANGED(${ts})! ${bonds[choosed].name} -> ${bonds[i].name}`,
         )
         currPrice = Number(price)
-        currROI = roi
-        currIndex = i
+        choosed = i
         changed = true
       }
     }
   })
-  const title = bonds[currIndex].name
-  const activity = `$${currPrice} ROI: ${currROI}%`
-  const image = changed ? bonds[currIndex].image : null
+  const title = bonds[choosed].name
+  const activity = `$${infos[choosed].value.price} ROI: ${infos[choosed].value.roi}%`
+  const image = changed ? bonds[choosed].image : null
   console.log(`${title} ${activity} ${image}`)
   return {
     title,
