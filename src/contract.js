@@ -7,6 +7,7 @@ const {
   circulatingSupplyContract,
   uniswapPairContract,
   bondNonStableCoinContract,
+  dystRouterContract,
 } = require('./abi')
 
 const {
@@ -22,6 +23,7 @@ const {
   sCLAM_ADDRESS,
   PEARL_ADDRESS,
   CLAM_CIRCULATING_SUPPLY,
+  DYST_ROUTER_ADDRESS,
 } = require('./constant')
 
 const provider = new ethers.providers.JsonRpcProvider(
@@ -39,6 +41,7 @@ const bondContract_WMATIC_CLAM44 = bondNonStableCoinContract(
   true,
 )
 
+const dystRouter = dystRouterContract(DYST_ROUTER_ADDRESS, provider)
 const pairContract_MAI_CLAM = uniswapPairContract(RESERVE_MAI_CLAM, provider)
 const pairContract_FRAX_CLAM = uniswapPairContract(RESERVE_FRAX_CLAM, provider)
 
@@ -64,4 +67,5 @@ module.exports = {
   sCLAM,
   PEARL,
   circulatingSupply_CLAM,
+  dystRouter,
 }

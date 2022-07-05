@@ -6,11 +6,12 @@ const {
   sCLAM,
   PEARL,
   circulatingSupply_CLAM,
+  dystRouter,
 } = require('./contract')
 
-const { CLAM_ADDRESS, RESERVE_MAI_CLAM } = require('./constant')
+const { CLAM_ADDRESS, RESERVE_MAI_CLAM,USDPLUS_ADDRESS } = require('./constant')
 const { commaNumber } = require('../src/utils')
-const { formatEther } = require('ethers/lib/utils')
+const { formatEther, formatUnits, parseUnits } = require('ethers/lib/utils')
 
 const getCirculatingSupply = async () => {
   return Number(
@@ -22,7 +23,7 @@ const getPearlTotalSupply = async () => {
   return Number(formatEther(await PEARL.totalSupply())).toFixed(0)
 }
 
-const getRawMarketPrice = async (
+const getQuickswapRawPrice = async (
   pairContract = pairContract_MAI_CLAM,
   assetAddress = RESERVE_MAI_CLAM,
 ) => {
@@ -39,10 +40,17 @@ const getRawMarketPrice = async (
   return marketPrice
 }
 
+const getDystRawPrice = async () => {
+  const [tokenUSDPLUS, tokenCLAM] = await dystRouter.getReserves(USDPLUS_ADDRESS, CLAM_ADDRESS,false)
+  const usd = tokenUSDPLUS.div(1e6)
+  const clam =tokenCLAM.div(1e9)
+  return usd.mul(1e9).div(clam)
+}
+
 const getPriceInfo = async () => {
   const [rawMarketPrice, stakingBalance, circSupply, totalSupply] =
     await Promise.all([
-      getRawMarketPrice(),
+      getDystRawPrice(),
       stakingContract.contractBalance(),
       circulatingSupply_CLAM.CLAMCirculatingSupply(),
       getCirculatingSupply(),
@@ -61,7 +69,7 @@ const getPriceInfo = async () => {
 
 const getPearlPriceInfo = async () => {
   const [rawMarketPrice, currentIndex] = await Promise.all([
-    getRawMarketPrice(),
+    getQuickswapRawPrice(),
     stakingContract.index(),
   ])
 
@@ -81,7 +89,7 @@ const getBondFiveDayRate = async () => {
 }
 const getBondInfo = async (bondContract, pairContract, assetAddress) => {
   const [rawMarketPrice, rawBondPrice, fiveDayRate] = await Promise.all([
-    getRawMarketPrice(pairContract, assetAddress),
+    getQuickswapRawPrice(pairContract, assetAddress),
     bondContract.bondPriceInUSD(),
     getBondFiveDayRate(),
   ])
