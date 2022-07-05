@@ -11,7 +11,6 @@ const {
 } = process.env
 
 const { priceSidebar, pearlPriceSidebar } = require('../src/price')
-const { bondSidebar } = require('../src/bond')
 const { rebaseSidebar } = require('../src/rebase')
 
 const { sidebarBot } = require('../src/sidebarBot')
@@ -28,11 +27,6 @@ const main = async () => {
       token: DISCORD_PRICE_PEARL_BOT_TOKEN,
       interval: UPDATE_INTERVAL,
       sidebar: pearlPriceSidebar,
-    }),
-    sidebarBot({
-      token: DISCORD_BOND_BOT_TOKEN,
-      interval: UPDATE_INTERVAL,
-      sidebar: bondSidebar(),
     }),
     sidebarBot({
       token: DISCORD_REBASE_BOT_TOKEN,
